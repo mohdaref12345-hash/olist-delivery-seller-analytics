@@ -63,7 +63,8 @@
   .insight{border-left:4px solid var(--orange)}
   .insight.t{border-left-color:var(--teal)}
 
-  table{border-collapse:collapse;width:100%;font-size:14px;background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .scroll{overflow-x:auto;border-radius:12px}
+  table{min-width:560px;border-collapse:collapse;width:100%;font-size:14px;background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden}
   th,td{padding:9px 12px;border-bottom:1px solid var(--line);text-align:left}
   th{background:#F1F5F9;font-size:13px;color:var(--slate)}
   td.n{text-align:right;font-variant-numeric:tabular-nums}
@@ -291,7 +292,7 @@
       </div>
     </div>
 
-    <table>
+    <div class="scroll"><table>
       <thead><tr><th>Metric</th><th>A. Report model</th><th>B. Raw-table DAX</th><th>C. Python on CSV</th><th>Status</th></tr></thead>
       <tbody>
         <tr><td>Delivered orders</td><td class="n">96,470</td><td class="n">96,470</td><td class="n">96,470</td><td class="ok">MATCH</td></tr>
@@ -304,7 +305,7 @@
         <tr><td>Average review score</td><td class="n">4.1562</td><td class="n">n/a</td><td class="n">4.1562</td><td class="ok">MATCH</td></tr>
         <tr><td>Seller late hand-off %</td><td class="n">9.32%</td><td class="n">n/a</td><td class="n">9.32%</td><td class="ok">MATCH</td></tr>
       </tbody>
-    </table>
+    </table></div>
     <p class="note">Full table: <a href="docs/reconciliation.csv">docs/reconciliation.csv</a>. Queries: <a href="docs/verification_queries.dax">docs/verification_queries.dax</a>.</p>
 
     <h3 style="margin-top:36px">A sample of the DAX</h3>
