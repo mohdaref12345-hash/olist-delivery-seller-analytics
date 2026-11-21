@@ -6,11 +6,6 @@
 
 A four-page Power BI dashboard on 96,470 delivered Olist orders, built with live DAX measures and verified three ways.
 
-![Power BI](https://img.shields.io/badge/Power%20BI-F2C811?style=flat&logo=powerbi&logoColor=black)
-![DAX](https://img.shields.io/badge/DAX-45%20measures-1E293B?style=flat)
-![Power Query](https://img.shields.io/badge/Power%20Query-M-0F766E?style=flat)
-![Python](https://img.shields.io/badge/Python-verification-3776AB?style=flat&logo=python&logoColor=white)
-
 [**Portfolio page**](https://mohdaref12345-hash.github.io/olist-delivery-seller-analytics/) ·
 [**Power BI file (.pbix)**](Olist_Delivery_Dashboard.pbix) ·
 [**PDF**](Olist_Dashboard.pdf) ·
