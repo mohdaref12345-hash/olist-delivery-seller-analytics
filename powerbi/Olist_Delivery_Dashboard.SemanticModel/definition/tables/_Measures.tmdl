@@ -214,7 +214,7 @@ table _Measures
 		displayFolder: 3 Helpers
 		lineageTag: 90f0e155-adec-464c-b5dc-69fc55942847
 
-	measure 'Safety Stock Text' = VAR sd = STDEV.P(orders[Delivery Days]) VAR avgd = [Avg Delivery Days] RETURN "Delivery time averages " & FORMAT(avgd, "0.0") & " days but varies by " & FORMAT(sd, "0.0") & " days (standard deviation). For a 95% service level, plan about " & FORMAT(1.65 * sd, "0.0") & " extra days of demand as safety stock (1.65 x standard deviation)."
+	measure 'Safety Stock Text' = VAR sd = STDEV.P(orders[Delivery Days]) VAR avgd = [Avg Delivery Days] RETURN "Delivery time averages " & FORMAT(avgd, "0.0") & " days but varies by " & FORMAT(sd, "0.0") & " days (standard deviation). As a rough guide, a buffer of 1.65 x that spread (about " & FORMAT(1.65 * sd, "0.0") & " days) would cover about 95% of cases if delivery times are roughly normal. A simple estimate, not a full inventory model."
 		displayFolder: 4 Text
 		lineageTag: 5a0b8bf5-eb67-4e90-81e9-6900ae549fc3
 

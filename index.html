@@ -255,7 +255,7 @@
           <li>Monthly delivered orders with a 3-month forecast and a 95% confidence band.</li>
           <li>Top 10 categories by revenue.</li>
           <li>Orders by weekday and orders by month of year.</li>
-          <li>A safety-stock note calculated by DAX from the delivery-time spread.</li>
+          <li>A delivery-time buffer note calculated by DAX from the delivery-time spread.</li>
         </ul>
       </div>
       <div class="card insight t">
@@ -264,7 +264,7 @@
           <li>Monthly orders grew steadily through 2017 and flattened in 2018. The forecast band is wide, so it is a rough guide.</li>
           <li>health_beauty and watches_gifts lead revenue at about 1.2M each, followed by bed_bath_table and sports_leisure at about 1.0M.</li>
           <li>Mondays are the busiest day (15.7K orders) and Saturdays the quietest (10.6K).</li>
-          <li>Delivery time averages 12.1 days with a standard deviation of 9.6. For a 95% service level, plan about 15.8 extra days (1.65 x standard deviation).</li>
+          <li>Delivery time averages 12.1 days with a standard deviation of 9.6. For a 95% service level, a buffer of about 15.8 days (1.65 x the standard deviation) would cover roughly 95% of cases if delivery times are roughly normal. A simple estimate, not a full inventory model.</li>
         </ul>
       </div>
     </div>

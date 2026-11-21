@@ -68,7 +68,7 @@ Top 10 and bottom 10 sellers by on-time hand-off (late hand-off 9.32%), days per
 ### 4. Demand & Forecast
 <a href="images/04_Demand_and_Forecast.png"><img src="images/04_Demand_and_Forecast.png" alt="Demand and Forecast" width="100%"></a>
 
-Monthly orders with a 3-month forecast, top 10 categories by revenue, orders by weekday and month, and a safety-stock note.
+Monthly orders with a 3-month forecast, top 10 categories by revenue, orders by weekday and month, and a delivery-time buffer note.
 
 ## Key Insights
 
@@ -78,7 +78,7 @@ Monthly orders with a 3-month forecast, top 10 categories by revenue, orders by 
 - **Seller performance varies widely.** The 10 best sellers hand over on time 100% of the time. The 10 worst range from 17.6% to 52.2%, and one of them has 246 orders at 49.7%.
 - **Freight is heavy for some categories.** It is 16.6% of revenue overall, but 36.5% for christmas_supplies and 30.4% for signaling_and_security.
 - **Demand.** Health_beauty and watches_gifts lead revenue at about 1.2M each. Monday is the busiest day (15.7K orders) and Saturday the quietest (10.6K).
-- **Safety stock.** Delivery time averages 12.1 days with a standard deviation of 9.6, so about 15.8 extra days of stock are needed for a 95% service level.
+- **Safety stock.** Delivery time averages 12.1 days with a standard deviation of 9.6, so a buffer of about 15.8 days (1.65 × the standard deviation) would cover roughly 95% of cases if delivery times are roughly normal. This is a simple estimate, not a full inventory model.
 
 ## Tools and Technologies
 

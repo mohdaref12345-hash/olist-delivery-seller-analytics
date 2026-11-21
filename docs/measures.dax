@@ -144,7 +144,7 @@ Late % (Other States) =
 IF([Late Rank (500+ States)] > 6, [Late Delivery %])
 
 Safety Stock Text =
-VAR sd = STDEV.P(orders[Delivery Days]) VAR avgd = [Avg Delivery Days] RETURN "Delivery time averages " & FORMAT(avgd, "0.0") & " days but varies by " & FORMAT(sd, "0.0") & " days (standard deviation). For a 95% service level, plan about " & FORMAT(1.65 * sd, "0.0") & " extra days of demand as safety stock (1.65 x standard deviation)."
+VAR sd = STDEV.P(orders[Delivery Days]) VAR avgd = [Avg Delivery Days] RETURN "Delivery time averages " & FORMAT(avgd, "0.0") & " days but varies by " & FORMAT(sd, "0.0") & " days (standard deviation). As a rough guide, a buffer of 1.65 x that spread (about " & FORMAT(1.65 * sd, "0.0") & " days) would cover about 95% of cases if delivery times are roughly normal. A simple estimate, not a full inventory model."
 
 Map Lat =
 VAR s = SELECTEDVALUE(customers[customer_state]) RETURN IF(NOT ISBLANK(s), CALCULATE(MAX(state_geo[lat]), state_geo[state] = s))
