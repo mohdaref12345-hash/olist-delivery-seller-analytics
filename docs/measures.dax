@@ -1,0 +1,156 @@
+// Olist Delivery & Seller Performance Analytics - DAX measures
+// Auto-extracted from the semantic model (table: _Measures). 45 measures.
+
+Delivered Orders =
+DISTINCTCOUNT(orders[order_id])
+
+Late Delivery % =
+AVERAGE(orders[Is Late])
+
+On-Time Delivery % =
+1 - AVERAGE(orders[Is Late])
+
+Avg Delivery Days =
+AVERAGE(orders[Delivery Days])
+
+Avg Delay (Late Orders) =
+CALCULATE(AVERAGE(orders[Delay Days]), orders[Is Late] = 1)
+
+Avg Review Score =
+AVERAGE(order_reviews[review_score])
+
+Review Score (Late) =
+CALCULATE([Avg Review Score], orders[Is Late] = 1)
+
+Review Score (On-Time) =
+CALCULATE([Avg Review Score], orders[Is Late] = 0)
+
+Avg Seller Handling =
+AVERAGE(orders[Seller Handling Days])
+
+Avg Carrier Transit =
+AVERAGE(orders[Carrier Transit Days])
+
+Revenue =
+SUM(order_items[price])
+
+Revenue (M) =
+DIVIDE([Revenue], 1000000)
+
+Freight Cost =
+SUM(order_items[freight_value])
+
+Freight % of Revenue =
+DIVIDE([Freight Cost], [Revenue])
+
+Seller Orders =
+DISTINCTCOUNT(order_items[order_id])
+
+Late Handoff % =
+AVERAGE(order_items[Seller Late Handoff Flag])
+
+Seller On-Time Handoff % =
+1 - AVERAGE(order_items[Seller Late Handoff Flag])
+
+Seller Rank Key =
+[Seller On-Time Handoff %] + [Seller Orders] / 10000000
+
+Seller Rank (Top) =
+IF([Seller Orders] >= 30, RANKX(FILTER(ALLSELECTED(sellers[Seller Short]), [Seller Orders] >= 30), [Seller Rank Key], , DESC, DENSE))
+
+Seller Rank (Bottom) =
+IF([Seller Orders] >= 30, RANKX(FILTER(ALLSELECTED(sellers[Seller Short]), [Seller Orders] >= 30), [Seller Rank Key], , ASC, DENSE))
+
+Qualifying State Count =
+COUNTROWS(FILTER(ALLSELECTED(customers[customer_state]), [Delivered Orders] >= 500))
+
+Late Rank (500+ States) =
+IF([Delivered Orders] >= 500, RANKX(FILTER(ALLSELECTED(customers[customer_state]), [Delivered Orders] >= 500), [Late Delivery %], , DESC, DENSE))
+
+Show State (Top 6 + Bottom 3) =
+VAR r = [Late Rank (500+ States)] VAR n = [Qualifying State Count] RETURN IF(NOT ISBLANK(r) && (r <= 6 || r > n - 3), 1, 0)
+
+State Bar Color =
+IF([Late Rank (500+ States)] <= 6, "#EA580C", "#0F766E")
+
+Month In Window =
+IF([Delivered Orders] >= 500, 1, 0)
+
+Month OTD Rank (Lowest) =
+IF([Month In Window] = 1, RANKX(FILTER(ALLSELECTED('Date'[Month Start]), [Delivered Orders] >= 500), [On-Time Delivery %], , ASC, DENSE))
+
+Low Month Marker Color =
+VAR r = [Month OTD Rank (Lowest)] RETURN IF(NOT ISBLANK(r) && r <= 3, "#EA580C", "#0F766E")
+
+Sub: Late % Text =
+FORMAT([Late Delivery %], "0.0%") & " late"
+
+Sub: Review Text =
+"late " & FORMAT([Review Score (Late)], "0.00") & " vs on-time " & FORMAT([Review Score (On-Time)], "0.00")
+
+Sub: Revenue Text =
+FORMAT([Delivered Orders], "#,0") & " delivered orders"
+
+Sub: Avg Delivery Text =
+"purchase to door"
+
+Sub: Avg Delay Text =
+"late orders only"
+
+Avg Review Card =
+FORMAT([Avg Review Score], "0.00") & " / 5"
+
+Avg Delivery Card =
+FORMAT([Avg Delivery Days], "0.0") & " days"
+
+Avg Delay Card =
+FORMAT([Avg Delay (Late Orders)], "0.0") & " days"
+
+Footer Text =
+"Public Olist dataset (Kaggle), " & FORMAT(CALCULATE([Delivered Orders], REMOVEFILTERS()), "#,0") & " delivered orders"
+
+Month Chart Title =
+VAR m = FILTER(ALLSELECTED('Date'[Month Start]), [Delivered Orders] >= 500)
+	RETURN IF(COUNTROWS(m) = 0, "On-time delivery % by month (no month has 500+ delivered orders in this selection)", "On-time delivery % by month (" & FORMAT(MINX(m, 'Date'[Month Start]), "mmm yyyy") & " - " & FORMAT(MAXX(m, 'Date'[Month Start]), "mmm yyyy") & ")")
+
+Key Findings =
+VAR states = FILTER(ALLSELECTED(customers[customer_state]), [Delivered Orders] >= 500)
+	VAR worstCode = MAXX(TOPN(1, states, [Late Delivery %], DESC), customers[customer_state])
+	VAR bigCode = MAXX(TOPN(1, states, [Delivered Orders], DESC), customers[customer_state])
+	VAR worstName = LOOKUPVALUE(customers[State Name], customers[customer_state], worstCode)
+	VAR bigName = LOOKUPVALUE(customers[State Name], customers[customer_state], bigCode)
+	VAR worstRate = CALCULATE([Late Delivery %], customers[customer_state] = worstCode)
+	VAR bigRate = CALCULATE([Late Delivery %], customers[customer_state] = bigCode)
+	VAR cLate = CALCULATE([Avg Carrier Transit], orders[Is Late] = 1)
+	VAR cOn = CALCULATE([Avg Carrier Transit], orders[Is Late] = 0)
+	VAR sLate = CALCULATE([Avg Seller Handling], orders[Is Late] = 1)
+	VAR sOn = CALCULATE([Avg Seller Handling], orders[Is Late] = 0)
+	VAR carrierDrives = (cLate - cOn) >= (sLate - sOn)
+	VAR opening = IF(carrierDrives, "Carrier transit, not seller handling, drives late orders: ", "Seller handling, not carrier transit, drives late orders: ")
+	VAR a = IF(carrierDrives, cLate, sLate)
+	VAR b = IF(carrierDrives, cOn, sOn)
+	VAR part1 = opening & FORMAT(a, "0.0") & " days versus " & FORMAT(b, "0.0") & " for on-time ones. "
+	VAR part2 = IF(COUNTROWS(states) = 0, "No state has 500+ delivered orders in this selection, so no state comparison is shown. ", worstName & " has the highest late rate at " & FORMAT(worstRate, "0.0%") & " against " & FORMAT(bigRate, "0.0%") & " in " & bigName & ", and ")
+	VAR part3 = IF(COUNTROWS(states) = 0, "Late orders", "late orders") & " score " & FORMAT([Review Score (Late)], "0.00") & " in reviews versus " & FORMAT([Review Score (On-Time)], "0.00") & "."
+	RETURN IF(ISBLANK(a) && ISBLANK(b), "Not enough delivered orders in this selection.", part1 & part2 & part3)
+
+OTD (Lowest 3 Months) =
+VAR r = [Month OTD Rank (Lowest)] RETURN IF(NOT ISBLANK(r) && r <= 3, [On-Time Delivery %])
+
+Late % (Highest 6 States) =
+IF([Late Rank (500+ States)] <= 6, [Late Delivery %])
+
+Late % (Other States) =
+IF([Late Rank (500+ States)] > 6, [Late Delivery %])
+
+Safety Stock Text =
+VAR sd = STDEV.P(orders[Delivery Days]) VAR avgd = [Avg Delivery Days] RETURN "Delivery time averages " & FORMAT(avgd, "0.0") & " days but varies by " & FORMAT(sd, "0.0") & " days (standard deviation). For a 95% service level, plan about " & FORMAT(1.65 * sd, "0.0") & " extra days of demand as safety stock (1.65 x standard deviation)."
+
+Map Lat =
+VAR s = SELECTEDVALUE(customers[customer_state]) RETURN IF(NOT ISBLANK(s), CALCULATE(MAX(state_geo[lat]), state_geo[state] = s))
+
+Map Lng =
+VAR s = SELECTEDVALUE(customers[customer_state]) RETURN IF(NOT ISBLANK(s), CALCULATE(MAX(state_geo[lng]), state_geo[state] = s))
+
+Late % (States 500+) =
+IF([Delivered Orders] >= 500, [Late Delivery %])
