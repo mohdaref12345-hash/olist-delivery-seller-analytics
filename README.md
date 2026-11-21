@@ -130,4 +130,5 @@ The data is stored inside the `.pbix` file, so the report works right away witho
 ## Author
 
 **Mohammed Aref Sultan**
-GitHub: [mohdaref12345-hash](https://github.com/mohdaref12345-hash)
+GitHub: [mohdaref12345-hash](https://github.com/mohdaref12345-hash)  
+LinkedIn: [Mohammed Sultan](https://www.linkedin.com/in/mohammed-sultan-b2b0473a3/)
