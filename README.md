@@ -14,7 +14,6 @@ An interactive Power BI dashboard that analyses delivery performance and seller 
 - [Tools and Technologies](#tools-and-technologies)
 - [Project Structure](#project-structure)
 - [How to Run the Project](#how-to-run-the-project)
-- [Author](#author)
 
 ## Overview
 
@@ -112,23 +111,9 @@ Monthly orders with a 3-month forecast, top 10 categories by revenue, orders by 
 
 You need **Power BI Desktop** (free, Windows).
 
-### Option 1: open the report file (quickest)
+### Open the report file
 
 1. Open [`Olist_Delivery_Dashboard.pbix`](Olist_Delivery_Dashboard.pbix) on GitHub and click the **Download raw file** icon (the file is about 52 MB).
 2. Open the downloaded file with Power BI Desktop.
 
 The data is stored inside the `.pbix` file, so the report works right away without the Excel files.
-
-### Option 2: open the project source (.pbip)
-
-1. In Power BI Desktop, enable the **Power BI Project (.pbip)** preview feature first (File, then Options and settings, then Options, then Preview features).
-2. Download the repository (**Code, then Download ZIP**) and unzip it.
-3. Open `powerbi/Olist_Delivery_Dashboard.pbip` in Power BI Desktop.
-4. Point the data sources to your local copy of the `data/` folder: **Transform data, then Data source settings**, and change each file path. The file names in `data/` are shorter than the names used in the report (for example `olist_orders.xlsx` is `olist_orders_dataset.xlsx` in the report).
-5. Click **Refresh**.
-
-## Author
-
-**Mohammed Aref Sultan**
-GitHub: [mohdaref12345-hash](https://github.com/mohdaref12345-hash)  
-LinkedIn: [Mohammed Sultan](https://www.linkedin.com/in/mohammed-sultan-b2b0473a3/)
