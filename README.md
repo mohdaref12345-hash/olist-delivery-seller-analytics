@@ -1,125 +1,127 @@
 # Delivery & Seller Performance Analytics (Olist)
 
-A Power BI dashboard that analyses delivery performance for an online marketplace.
+An interactive Power BI dashboard that analyses delivery performance and seller performance for an e-commerce marketplace, using the public Olist Brazilian E-Commerce dataset.
 
-## About the project
+**Live portfolio page:** https://mohdaref12345-hash.github.io/olist-delivery-seller-analytics/
 
-This project uses the public **Olist Brazilian e-commerce** dataset. It looks at **96,470 delivered orders** and answers three questions:
+## Table of Contents
 
-- How often are orders delivered on time, and where and when do delays happen?
-- Is the delay caused by the **seller** (slow hand-over) or by the **carrier** (slow transit)?
-- Which states, sellers and product categories need attention?
+- [Overview](#overview)
+- [Objectives](#objectives)
+- [Dataset](#dataset)
+- [Dashboard Screenshots](#dashboard-screenshots)
+- [Key Insights](#key-insights)
+- [Tools and Technologies](#tools-and-technologies)
+- [Project Structure](#project-structure)
+- [How to Run the Project](#how-to-run-the-project)
+- [Author](#author)
 
-**Main result:** the carrier is the main cause of late orders. Late orders spend **25.2 days** in transit versus **7.4** for on-time ones, and they get a much lower review score (**2.57** versus **4.29**).
+## Overview
 
-The main KPI is **OTD** (on-time delivery): an order is late when it arrives after the estimated delivery date.
+The project analyses **96,470 delivered orders** and shows how reliably they reached customers, where and when delays happen, and which sellers, states and categories need attention. The main KPI is **On-Time Delivery (OTD)**: an order is late when it arrives after the estimated delivery date.
 
-Author: **Mohammed Aref Sultan** ([GitHub](https://github.com/mohdaref12345-hash))
+The report has four pages: Executive Overview, Delivery by Region, Seller & Carrier Performance, and Demand & Forecast. All pages share the same filters (Year, State, Category).
 
-## Links
+## Objectives
 
-| What | Link |
+- Measure on-time delivery and track it over time.
+- Find which states are slow or late.
+- Find out whether delays are caused by the seller or by the carrier.
+- Rank the best and worst sellers.
+- Understand demand, top categories and the buffer stock needed.
+
+## Dataset
+
+Source: [Olist Brazilian E-Commerce Public Dataset](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce) (Kaggle). The nine Excel files are in the [`data/`](data/) folder.
+
+| File | Content |
 |---|---|
-| Portfolio page (dashboards explained) | https://mohdaref12345-hash.github.io/olist-delivery-seller-analytics/ |
-| Power BI report file | [Olist_Delivery_Dashboard.pbix](Olist_Delivery_Dashboard.pbix) |
-| Report as PDF | [Olist_Dashboard.pdf](Olist_Dashboard.pdf) |
-| Source data (9 Excel files) | [data/](data/) |
-| Power BI project source | [powerbi/](powerbi/) |
-| All 45 DAX measures | [docs/measures.dax](docs/measures.dax) |
-| Verification results | [docs/reconciliation.csv](docs/reconciliation.csv) |
+| `olist_orders.xlsx` | Orders, status and timestamps |
+| `olist_order_items.xlsx` | Items per order: seller, product, price, freight |
+| `olist_customers.xlsx` | Customer city and state |
+| `olist_sellers.xlsx` | Seller city and state |
+| `olist_products.xlsx` | Product to category |
+| `olist_categories.xlsx` | Category names (Portuguese and English) |
+| `olist_reviews.xlsx` | Review score per order |
+| `olist_payments.xlsx` | Payments (not used in the report) |
+| `olist_geolocation.xlsx` | Zip-code coordinates (not used in the report) |
 
-## Dashboards
+Only delivered orders are analysed. States, months and categories need 500+ orders to be ranked, and sellers need 30+ orders.
 
-The report has four pages. All of them share the same three filters (Year, State, Category).
+## Dashboard Screenshots
 
 ### 1. Executive Overview
-
 <a href="images/01_Executive_Overview.png"><img src="images/01_Executive_Overview.png" alt="Executive Overview" width="100%"></a>
 
-The big picture: how reliable delivery is and where the delay comes from.
-
-- **On-time delivery: 91.9%** (8.1% late)
-- **Average delivery: 12.1 days** from purchase to door
-- **Average delay: 8.9 days** on late orders
-- **Average review: 4.16 / 5** (late orders 2.57, on-time orders 4.29)
-- **Revenue: 13.2M** from 96,470 delivered orders
-- Late orders spend **25.2 days** with the carrier versus 7.4 for on-time ones. Seller handling is 5.4 versus 2.5 days.
-- Highest late rate by state: Maranhão 19.7%, Ceará 15.3%, Bahia 14.0%. São Paulo is 5.9%.
+KPI cards (OTD 91.9%, average delivery 12.1 days, average delay 8.9 days, average review 4.16 / 5, revenue 13.2M), on-time delivery by month, late delivery by state, and days per stage (seller handling vs carrier transit).
 
 ### 2. Delivery by Region
-
 <a href="images/02_Delivery_by_Region.png"><img src="images/02_Delivery_by_Region.png" alt="Delivery by Region" width="100%"></a>
 
-Which states are late or slow, and where freight costs a lot.
-
-- **Delivered orders: 96,470** and **freight is 16.6% of revenue**
-- Slowest average delivery: Roraima 29.0 days, Amapá 26.7 days, Amazonas 26.0 days
-- A bubble map shows the late rate by state
-- Highest freight share by category: christmas_supplies 36.5%, signaling_and_security 30.4%
+Late delivery % and average delivery days by state, a bubble map, and freight as a share of revenue by category (16.6% overall).
 
 ### 3. Seller & Carrier Performance
-
 <a href="images/03_Seller_and_Carrier.png"><img src="images/03_Seller_and_Carrier.png" alt="Seller and Carrier" width="100%"></a>
 
-Who hands orders over late, and whether the problem is the seller or the carrier.
-
-- **Late hand-off: 9.32%**, seller handling **2.7 days**, carrier transit **8.9 days**
-- The 10 best sellers (30+ orders) hand over on time **100%** of the time
-- The 10 worst sellers range from **17.6% to 52.2%**. One seller has 246 orders at 49.7%.
-- Review score: **2.57** for late orders versus **4.29** for on-time orders
+Top 10 and bottom 10 sellers by on-time hand-off (late hand-off 9.32%), days per stage, and review score by delivery status.
 
 ### 4. Demand & Forecast
-
 <a href="images/04_Demand_and_Forecast.png"><img src="images/04_Demand_and_Forecast.png" alt="Demand and Forecast" width="100%"></a>
 
-How demand moves, which categories earn the most, and how much buffer stock is needed.
+Monthly orders with a 3-month forecast, top 10 categories by revenue, orders by weekday and month, and a safety-stock note.
 
-- Monthly orders with a **3-month forecast** (95% confidence band)
-- Top categories by revenue: health_beauty and watches_gifts about **1.2M** each
-- Busiest day: Monday (**15.7K** orders). Quietest: Saturday (**10.6K**).
-- Delivery time averages **12.1 days** and varies by **9.6 days**, so plan about **15.8 extra days** of safety stock for a 95% service level
+## Key Insights
 
-## Tools
+- **The carrier causes most of the delay.** Late orders spend 25.2 days in transit versus 7.4 days for on-time orders. Seller handling is 5.4 versus 2.5 days.
+- **Late orders get lower reviews.** The average review is 2.57 for late orders and 4.29 for on-time orders.
+- **Delays are highest in the north and north-east.** Late rate: Maranhão 19.7%, Ceará 15.3%, Bahia 14.0%, compared with São Paulo 5.9%. Slowest average delivery: Roraima 29.0 days, Amapá 26.7 days, Amazonas 26.0 days.
+- **Seller performance varies widely.** The 10 best sellers hand over on time 100% of the time. The 10 worst range from 17.6% to 52.2%, and one of them has 246 orders at 49.7%.
+- **Freight is heavy for some categories.** It is 16.6% of revenue overall, but 36.5% for christmas_supplies and 30.4% for signaling_and_security.
+- **Demand.** Health_beauty and watches_gifts lead revenue at about 1.2M each. Monday is the busiest day (15.7K orders) and Saturday the quietest (10.6K).
+- **Safety stock.** Delivery time averages 12.1 days with a standard deviation of 9.6, so about 15.8 extra days of stock are needed for a 95% service level.
 
-- **Power BI Desktop**: report design and data model
-- **Power Query**: data preparation
-- **DAX**: 45 measures and calculated columns
-- **Excel**: data source files
-- **Python**: independent check of the numbers
-- **Git and GitHub**: version control and hosting
+## Tools and Technologies
 
-## Repository
+- Power BI Desktop (report and data model)
+- Power Query (data preparation)
+- DAX (45 measures and calculated columns, see [`docs/measures.dax`](docs/measures.dax))
+- Microsoft Excel (data sources)
+- Python (independent check of the numbers, see [`docs/reconciliation.csv`](docs/reconciliation.csv))
+- Git and GitHub
+
+## Project Structure
 
 ```
-README.md
-index.html                       portfolio page
-Olist_Delivery_Dashboard.pbix    Power BI report (data included)
-Olist_Dashboard.pdf              report as PDF
-images/                          the four dashboard pages (4K)
-data/                            the nine source Excel files
-powerbi/                         Power BI project source (.pbip)
-docs/
-  measures.dax                   all DAX measures
-  verification_queries.dax       queries used to check the numbers
-  reconciliation.csv             verification results
-  MODEL_NOTES.md                 model notes
-  Olist_Theme.json               colour theme
+.
+├── README.md
+├── index.html                       # portfolio page
+├── Olist_Delivery_Dashboard.pbix    # Power BI report (data included)
+├── Olist_Dashboard.pdf              # report as PDF
+├── images/                          # dashboard screenshots (4K)
+├── data/                            # the nine source Excel files
+├── powerbi/                         # Power BI project source (.pbip)
+└── docs/
+    ├── measures.dax                 # all DAX measures
+    ├── verification_queries.dax     # queries used to check the numbers
+    ├── reconciliation.csv           # verification results
+    ├── MODEL_NOTES.md               # model notes
+    └── Olist_Theme.json             # colour theme
 ```
 
-## How to open the report in Power BI (from GitHub)
+## How to Run the Project
 
 You need **Power BI Desktop** (free, Windows).
 
-1. Open [`Olist_Delivery_Dashboard.pbix`](Olist_Delivery_Dashboard.pbix) on GitHub.
-2. Click the **download** icon (Download raw file) at the top right of the file view. The file is about 52 MB.
-3. Double-click the downloaded file, or open Power BI Desktop and choose **File, then Open report**.
+1. Open [`Olist_Delivery_Dashboard.pbix`](Olist_Delivery_Dashboard.pbix) on GitHub and click the **Download raw file** icon (the file is about 52 MB).
+2. Open the downloaded file with Power BI Desktop.
 
-The data is stored inside the `.pbix`, so the report opens and works right away. You do not need the Excel files to view it.
+The data is stored inside the `.pbix` file, so the report works right away without the Excel files.
 
-**To refresh the data or edit the queries**, download the repository (**Code, then Download ZIP**) and point Power BI to your copy of the data:
+**To refresh the data:** download the repository (**Code, then Download ZIP**), then in Power BI Desktop go to **Transform data, then Data source settings** and point each file to the matching file in the `data/` folder. The file names in `data/` are shorter than the names used in the report (for example `olist_orders.xlsx` is `olist_orders_dataset.xlsx` in the report). Then click **Refresh**.
 
-1. In Power BI Desktop choose **Transform data, then Data source settings**.
-2. Change each file path to the matching file in the `data/` folder. The file names in `data/` are shorter than the ones the report was built with (for example `olist_orders.xlsx` is `olist_orders_dataset.xlsx` in the report).
-3. Click **Refresh**.
+To open the project source instead, enable the **Power BI Project (.pbip)** preview feature, then open `powerbi/Olist_Delivery_Dashboard.pbip`.
 
-To open the project source instead, enable the **Power BI Project (.pbip)** preview feature in Power BI Desktop, then open `powerbi/Olist_Delivery_Dashboard.pbip`.
+## Author
+
+**Mohammed Aref Sultan**
+GitHub: [mohdaref12345-hash](https://github.com/mohdaref12345-hash)
