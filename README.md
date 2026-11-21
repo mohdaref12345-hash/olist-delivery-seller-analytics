@@ -28,7 +28,7 @@ A four-page Power BI dashboard on the public **Olist Brazilian e-commerce** data
 ### 4. Demand & Forecast
 ![Demand & Forecast](images/04_Demand_and_Forecast.png)
 
-A full walkthrough with explanations is in [`index.html`](index.html) (open it locally, or via GitHub Pages if enabled). A PDF copy is in [`Olist_Dashboard.pdf`](Olist_Dashboard.pdf).
+A full walkthrough with explanations is in [`index.html`](index.html) (open it locally, or via GitHub Pages if enabled). A PDF copy is in [`Olist_Dashboard.pdf`](Olist_Dashboard.pdf), and the ready-to-open report is [`Olist_Delivery_Dashboard.pbix`](Olist_Delivery_Dashboard.pbix) (52 MB, data included).
 
 ## What's inside
 
@@ -36,6 +36,7 @@ A full walkthrough with explanations is in [`index.html`](index.html) (open it l
 README.md
 index.html              portfolio page with all four dashboards explained
 Olist_Dashboard.pdf     the report as a PDF
+Olist_Delivery_Dashboard.pbix   the report file, data included (open in Power BI Desktop)
 images/                 the four pages in 4K
 data/                   the nine Olist source Excel files
 powerbi/                Power BI project (PBIP, readable text files)
@@ -53,6 +54,10 @@ docs/
 - The map is a scatter-plot bubble map using approximate state-capital coordinates, because the built-in map visuals depend on Bing Maps, which is being retired.
 
 ## Open the report
+
+**Quickest:** download `Olist_Delivery_Dashboard.pbix` and open it in Power BI Desktop. The data is already inside the file.
+
+**Or open the project source:**
 
 1. In Power BI Desktop, enable the **Power BI Project (.pbip)** preview feature.
 2. Open `powerbi/Olist_Delivery_Dashboard.pbip`.
