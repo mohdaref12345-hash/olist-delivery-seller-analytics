@@ -13,6 +13,10 @@ A four-page Power BI dashboard on the public **Olist Brazilian e-commerce** data
 | PDF copy of the report | [`Olist_Dashboard.pdf`](Olist_Dashboard.pdf) |
 | Repository | https://github.com/mohdaref12345-hash/olist-delivery-seller-analytics |
 
+## Contents
+
+[Links](#links) · [Headline finding](#headline-finding) · [Dashboards](#dashboards) · [Project scope](#project-scope) · [Data sources](#data-sources) · [Calculations used](#calculations-used) · [Tools and technologies](#tools-and-technologies) · [Project files](#project-files) · [Open the report](#open-the-report) · [Author](#author)
+
 ## Headline finding
 
 Carrier transit, not seller handling, drives late orders: **25.2 days** in transit for late orders versus **7.4** for on-time ones. Late orders also score **2.57** in reviews versus **4.29**.
@@ -30,17 +34,87 @@ Carrier transit, not seller handling, drives late orders: **25.2 days** in trans
 
 ## Dashboards
 
+All four pages share the same left sidebar for navigation and three slicers (**Year, State, Category**) that filter every page. Click an image to open it full size.
+
 ### 1. Executive Overview
+
 ![Executive Overview](images/01_Executive_Overview.png)
 
+**Purpose:** a one-page answer to "how are we doing, when did it go wrong, and at which stage is the delay?"
+
+| Visual | What it shows |
+|---|---|
+| KPI cards | OTD 91.9% (8.1% late), average delivery 12.1 days, average delay 8.9 days on late orders, average review 4.16 / 5 (late 2.57 vs on-time 4.29), revenue 13.2M on 96,470 delivered orders |
+| On-time delivery % by month | Monthly OTD from January 2017 to August 2018. The three lowest months are highlighted in orange |
+| Late delivery % by customer state | Only states with 500+ delivered orders. The six worst are orange, the best three teal |
+| Where the delay happens | Days per stage, seller handling vs carrier transit, split into late and on-time orders |
+| Key findings | A text box written by a DAX measure, so it updates with the slicers |
+
+**What it shows**
+- Overall OTD is 91.9%, but monthly OTD dipped close to 80% in the weakest month.
+- Maranhão has the highest late rate (19.7%), then Ceará (15.3%) and Bahia (14.0%). São Paulo is at 5.9%.
+- The gap is in transit: **25.2 days** for late orders against **7.4** for on-time ones. Seller handling differs by only about three days (5.4 vs 2.5).
+
 ### 2. Delivery by Region
+
 ![Delivery by Region](images/02_Delivery_by_Region.png)
 
+**Purpose:** find which states are slow or late, and where freight takes a large share of revenue.
+
+| Visual | What it shows |
+|---|---|
+| KPI cards | Delivered orders, OTD, average delivery, revenue, freight as a share of revenue (16.6%) |
+| Late delivery % by state | The 17 states with 500+ delivered orders, ranked |
+| Average delivery days by state | Slowest states first |
+| Bubble map | Late % by state, bubble size is the late rate (approximate state-capital coordinates) |
+| Categories by freight % of revenue | Product categories ranked by freight cost relative to revenue |
+
+**What it shows**
+- The slowest deliveries are in the north: Roraima 29.0 days, Amapá 26.7, Amazonas 26.0. The south-east is far faster.
+- Freight is 16.6% of revenue overall, but some categories are much heavier, such as christmas_supplies (36.5%) and signaling_and_security (30.4%).
+- Late rate and delivery time do not rank the states identically, so both views are kept.
+
 ### 3. Seller & Carrier Performance
+
 ![Seller & Carrier](images/03_Seller_and_Carrier.png)
 
+**Purpose:** see who hands orders to the carrier late, and whether the problem sits with sellers or with the carrier.
+
+| Visual | What it shows |
+|---|---|
+| KPI cards | Delivered orders, late hand-off % (9.32%), average seller handling (2.7 days), average carrier transit (8.9 days), average review |
+| Top 10 and Bottom 10 sellers | Ranked by on-time hand-off. Only sellers with 30+ orders are ranked, so small samples cannot top the table |
+| Days per stage: seller vs carrier | Average handling and transit days, late vs on-time |
+| Average review score by delivery status | Late 2.57 vs on-time 4.29 |
+
+**What it shows**
+- The ten best sellers all hand over on time (100%), including sellers with 150+ orders.
+- The ten worst range from 17.6% to 52.2% on-time hand-off. One of them handles 246 orders at 49.7%, a high-volume problem worth acting on.
+- Late orders score far lower in reviews, so lateness has a clear customer cost.
+
+Sellers are shown by the first 8 characters of their ID (unique across all 3,095 sellers). Ranking ties are broken by order volume.
+
 ### 4. Demand & Forecast
+
 ![Demand & Forecast](images/04_Demand_and_Forecast.png)
+
+**Purpose:** understand demand trends, which categories earn the revenue, and how much buffer variable delivery time requires.
+
+| Visual | What it shows |
+|---|---|
+| Monthly delivered orders | Orders per month with a 3-month forecast and a 95% confidence band |
+| Top 10 categories by revenue | Revenue by product category |
+| Orders by weekday | Orders for each day of the week |
+| Orders by month of year | Orders for each calendar month |
+| Safety stock note | A DAX-written text based on the spread of delivery times |
+
+**What it shows**
+- Monthly orders grew steadily through 2017 and flattened in 2018. The forecast band is wide, so it is a rough guide only.
+- health_beauty and watches_gifts lead revenue at about 1.2M each, followed by bed_bath_table and sports_leisure at about 1.0M.
+- Mondays are the busiest day (15.7K orders) and Saturdays the quietest (10.6K).
+- Delivery time averages 12.1 days with a standard deviation of 9.6. For a 95% service level, plan about **15.8 extra days** (1.65 × standard deviation).
+
+Read the month-of-year chart with care: January to August include two years of orders, September to December only one, so the totals are not like-for-like.
 
 ## Project scope
 
