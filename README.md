@@ -1,169 +1,153 @@
-# Delivery & Seller Performance Analytics (Olist) – Power BI
+<div align="center">
 
-A four-page Power BI dashboard on the public **Olist Brazilian e-commerce** dataset. It measures how reliably **96,470 delivered orders** reached customers, where and why they were late, which sellers drive the problem, and what demand looks like.
+# Delivery & Seller Performance Analytics
 
-**Author:** Mohammed Aref Sultan · [GitHub](https://github.com/mohdaref12345-hash)
+**Where do e-commerce deliveries go wrong, and who is responsible: the seller or the carrier?**
 
-## Links
+A four-page Power BI dashboard on 96,470 delivered Olist orders, built with live DAX measures and verified three ways.
 
-| | |
-|---|---|
-| Portfolio page (all dashboards explained) | https://mohdaref12345-hash.github.io/olist-delivery-seller-analytics/ |
-| Power BI report file | [`Olist_Delivery_Dashboard.pbix`](https://github.com/mohdaref12345-hash/olist-delivery-seller-analytics/blob/main/Olist_Delivery_Dashboard.pbix) (open in Power BI Desktop, data included) |
-| PDF copy of the report | [`Olist_Dashboard.pdf`](Olist_Dashboard.pdf) |
-| Repository | https://github.com/mohdaref12345-hash/olist-delivery-seller-analytics |
+![Power BI](https://img.shields.io/badge/Power%20BI-F2C811?style=flat&logo=powerbi&logoColor=black)
+![DAX](https://img.shields.io/badge/DAX-45%20measures-1E293B?style=flat)
+![Power Query](https://img.shields.io/badge/Power%20Query-M-0F766E?style=flat)
+![Python](https://img.shields.io/badge/Python-verification-3776AB?style=flat&logo=python&logoColor=white)
+
+[**Portfolio page**](https://mohdaref12345-hash.github.io/olist-delivery-seller-analytics/) ·
+[**Power BI file (.pbix)**](Olist_Delivery_Dashboard.pbix) ·
+[**PDF**](Olist_Dashboard.pdf) ·
+[**DAX measures**](docs/measures.dax)
+
+<a href="images/01_Executive_Overview.png"><img src="images/01_Executive_Overview.png" alt="Executive Overview dashboard" width="100%"></a>
+
+</div>
+
+---
 
 ## Contents
 
-[Links](#links) · [Headline finding](#headline-finding) · [Dashboards](#dashboards) · [Project scope](#project-scope) · [Data sources](#data-sources) · [Calculations used](#calculations-used) · [Tools and technologies](#tools-and-technologies) · [Project files](#project-files) · [Open the report](#open-the-report) · [Author](#author)
+[Result in brief](#result-in-brief) · [Business problem](#business-problem) · [Key findings and suggested actions](#key-findings-and-suggested-actions) · [The four dashboards](#the-four-dashboards) · [Data and model](#data-and-model) · [Method](#method) · [Scope and limitations](#scope-and-limitations) · [Tools](#tools) · [Repository](#repository) · [Open the report](#open-the-report) · [Author](#author)
 
-## Headline finding
+## Result in brief
 
-Carrier transit, not seller handling, drives late orders: **25.2 days** in transit for late orders versus **7.4** for on-time ones. Late orders also score **2.57** in reviews versus **4.29**.
+Late orders are a **carrier-transit problem, not a seller-handling problem**. Late orders spend **25.2 days** with the carrier versus **7.4** for on-time ones, while seller handling differs by only about three days. Late orders also cost customer satisfaction: **2.57** average review versus **4.29**.
 
-| KPI | Value |
-|---|---|
-| On-time delivery (OTD) | 91.9% (8.1% late) |
-| Average delivery (purchase to door) | 12.1 days |
-| Average delay on late orders | 8.9 days |
-| Average review | 4.16 / 5 |
-| Revenue | 13.2M |
-| Freight as a share of revenue | 16.6% |
+| On-time delivery | Avg delivery | Avg delay (late orders) | Avg review | Revenue | Freight / revenue |
+|:---:|:---:|:---:|:---:|:---:|:---:|
+| **91.9%** | **12.1 days** | **8.9 days** | **4.16 / 5** | **13.2M** | **16.6%** |
 
-> The KPI is **OTD** (on-time delivery), not OTIF: the dataset has no in-full information.
+> The KPI is **OTD** (on-time delivery), not OTIF, because the dataset has no in-full information. An order is late when it arrives after the estimated delivery date.
 
-## Dashboards
+## Business problem
 
-All four pages share the same left sidebar for navigation and three slicers (**Year, State, Category**) that filter every page.
+An online marketplace promises a delivery date. When it is missed, customers rate the experience lower. The questions this project answers:
+
+1. How reliable is delivery overall, and how has it changed over time?
+2. Which regions are slow or late, and where does freight take a large share of revenue?
+3. Is the delay created by sellers (handing orders over late) or by the carrier (transit)?
+4. Which sellers need attention first?
+5. What does demand look like, and how much buffer does variable delivery time require?
+
+## Key findings and suggested actions
+
+| # | Finding | Evidence |
+|---|---|---|
+| 1 | The carrier, not the seller, drives lateness | Transit 25.2 days (late) vs 7.4 (on-time); seller handling 5.4 vs 2.5 |
+| 2 | Lateness is concentrated in the north and north-east | Late rate: Maranhão 19.7%, Ceará 15.3%, Bahia 14.0%, vs São Paulo 5.9%. Slowest average delivery: Roraima 29.0 days, Amapá 26.7, Amazonas 26.0 |
+| 3 | A few high-volume sellers hurt performance | Ten best sellers are at 100% on-time hand-off; the ten worst range from 17.6% to 52.2%, one with 246 orders at 49.7% |
+| 4 | Lateness has a direct customer cost | Average review 2.57 for late orders vs 4.29 on time |
+| 5 | Freight weight varies widely by category | 16.6% of revenue overall, but christmas_supplies 36.5% and signaling_and_security 30.4% |
+
+**Suggested actions (analyst view, based on the patterns above; the data shows association, not proven cause):**
+- Prioritise carrier performance and escalation in the six highest-late states (MA, CE, BA, RJ, PA, ES) before working on seller processes.
+- Open a performance review with the worst sellers, starting with the high-volume ones.
+- Set more realistic delivery estimates for the slowest states, so the promise matches what the carrier delivers.
+- Plan about 15.8 extra days of demand as safety stock for a 95% service level (delivery time averages 12.1 days with a standard deviation of 9.6).
+- Review pricing or shipping terms for the categories where freight is a large share of revenue.
+
+## The four dashboards
+
+All pages share a left sidebar for navigation and three slicers (**Year, State, Category**) that filter every page. Click an image to open the 4K version.
 
 ### 1. Executive Overview
+<a href="images/01_Executive_Overview.png"><img src="images/01_Executive_Overview.png" alt="Executive Overview" width="100%"></a>
 
-![Executive Overview](images/01_Executive_Overview.png)
+**Answers:** how are we doing overall, when did it go wrong, and at which stage is the delay?
 
-**Purpose:** a one-page answer to "how are we doing, when did it go wrong, and at which stage is the delay?"
-
-| Visual | What it shows |
-|---|---|
-| KPI cards | OTD 91.9% (8.1% late), average delivery 12.1 days, average delay 8.9 days on late orders, average review 4.16 / 5 (late 2.57 vs on-time 4.29), revenue 13.2M on 96,470 delivered orders |
-| On-time delivery % by month | Monthly OTD from January 2017 to August 2018. The three lowest months are highlighted in orange |
-| Late delivery % by customer state | Only states with 500+ delivered orders. The six worst are orange, the best three teal |
-| Where the delay happens | Days per stage, seller handling vs carrier transit, split into late and on-time orders |
-| Key findings | A text box written by a DAX measure, so it updates with the slicers |
-
-**What it shows**
-- Overall OTD is 91.9%, but monthly OTD dipped close to 80% in the weakest month.
-- Maranhão has the highest late rate (19.7%), then Ceará (15.3%) and Bahia (14.0%). São Paulo is at 5.9%.
-- The gap is in transit: **25.2 days** for late orders against **7.4** for on-time ones. Seller handling differs by only about three days (5.4 vs 2.5).
+- Five KPI cards, and on-time delivery by month (Jan 2017 to Aug 2018) with the three lowest months in orange.
+- Late % by customer state (states with 500+ orders only): six worst in orange, best three in teal.
+- Days per stage, seller handling versus carrier transit, for late and on-time orders.
+- A key-findings text box written by a DAX measure, so it follows the slicers.
 
 ### 2. Delivery by Region
+<a href="images/02_Delivery_by_Region.png"><img src="images/02_Delivery_by_Region.png" alt="Delivery by Region" width="100%"></a>
 
-![Delivery by Region](images/02_Delivery_by_Region.png)
+**Answers:** which states are slow or late, and where is freight heavy?
 
-**Purpose:** find which states are slow or late, and where freight takes a large share of revenue.
-
-| Visual | What it shows |
-|---|---|
-| KPI cards | Delivered orders, OTD, average delivery, revenue, freight as a share of revenue (16.6%) |
-| Late delivery % by state | The 17 states with 500+ delivered orders, ranked |
-| Average delivery days by state | Slowest states first |
-| Bubble map | Late % by state, bubble size is the late rate (approximate state-capital coordinates) |
-| Categories by freight % of revenue | Product categories ranked by freight cost relative to revenue |
-
-**What it shows**
-- The slowest deliveries are in the north: Roraima 29.0 days, Amapá 26.7, Amazonas 26.0. The south-east is far faster.
-- Freight is 16.6% of revenue overall, but some categories are much heavier, such as christmas_supplies (36.5%) and signaling_and_security (30.4%).
-- Late rate and delivery time do not rank the states identically, so both views are kept.
+- Late % and average delivery days by state (17 states with 500+ orders).
+- A bubble map of late % (bubble size is the late rate).
+- Categories ranked by freight as a share of revenue.
 
 ### 3. Seller & Carrier Performance
+<a href="images/03_Seller_and_Carrier.png"><img src="images/03_Seller_and_Carrier.png" alt="Seller and Carrier" width="100%"></a>
 
-![Seller & Carrier](images/03_Seller_and_Carrier.png)
+**Answers:** who hands orders to the carrier late, and is the problem the seller or the carrier?
 
-**Purpose:** see who hands orders to the carrier late, and whether the problem sits with sellers or with the carrier.
-
-| Visual | What it shows |
-|---|---|
-| KPI cards | Delivered orders, late hand-off % (9.32%), average seller handling (2.7 days), average carrier transit (8.9 days), average review |
-| Top 10 and Bottom 10 sellers | Ranked by on-time hand-off. Only sellers with 30+ orders are ranked, so small samples cannot top the table |
-| Days per stage: seller vs carrier | Average handling and transit days, late vs on-time |
-| Average review score by delivery status | Late 2.57 vs on-time 4.29 |
-
-**What it shows**
-- The ten best sellers all hand over on time (100%), including sellers with 150+ orders.
-- The ten worst range from 17.6% to 52.2% on-time hand-off. One of them handles 246 orders at 49.7%, a high-volume problem worth acting on.
-- Late orders score far lower in reviews, so lateness has a clear customer cost.
-
-Sellers are shown by the first 8 characters of their ID (unique across all 3,095 sellers). Ranking ties are broken by order volume.
+- Top 10 and bottom 10 sellers by on-time hand-off. Only sellers with 30+ orders are ranked, so a seller with a handful of orders cannot top the table. Ties are broken by order volume.
+- Days per stage and average review score, late versus on-time.
+- Late hand-off is 9.32% of order items; seller handling averages 2.7 days and carrier transit 8.9.
 
 ### 4. Demand & Forecast
+<a href="images/04_Demand_and_Forecast.png"><img src="images/04_Demand_and_Forecast.png" alt="Demand and Forecast" width="100%"></a>
 
-![Demand & Forecast](images/04_Demand_and_Forecast.png)
+**Answers:** how is demand trending, which categories earn the revenue, and how much buffer is needed?
 
-**Purpose:** understand demand trends, which categories earn the revenue, and how much buffer variable delivery time requires.
+- Monthly delivered orders with a 3-month forecast and 95% confidence band (Power BI's built-in forecast; the wide band means it is a rough guide).
+- Top 10 categories by revenue (health_beauty and watches_gifts about 1.2M each), orders by weekday (Monday busiest at 15.7K, Saturday quietest at 10.6K) and by month.
+- A safety-stock note calculated by DAX from the spread of delivery times.
+- Read the month-of-year chart with care: January to August cover two years of data, September to December only one.
 
-| Visual | What it shows |
-|---|---|
-| Monthly delivered orders | Orders per month with a 3-month forecast and a 95% confidence band |
-| Top 10 categories by revenue | Revenue by product category |
-| Orders by weekday | Orders for each day of the week |
-| Orders by month of year | Orders for each calendar month |
-| Safety stock note | A DAX-written text based on the spread of delivery times |
+## Data and model
 
-**What it shows**
-- Monthly orders grew steadily through 2017 and flattened in 2018. The forecast band is wide, so it is a rough guide only.
-- health_beauty and watches_gifts lead revenue at about 1.2M each, followed by bed_bath_table and sports_leisure at about 1.0M.
-- Mondays are the busiest day (15.7K orders) and Saturdays the quietest (10.6K).
-- Delivery time averages 12.1 days with a standard deviation of 9.6. For a 95% service level, plan about **15.8 extra days** (1.65 × standard deviation).
+**Source:** [Olist Brazilian E-Commerce Public Dataset](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce) (Kaggle). The nine Excel files are in [`data/`](data/); their names on GitHub are shortened, and the Power BI project still points to the original names.
 
-Read the month-of-year chart with care: January to August include two years of orders, September to December only one, so the totals are not like-for-like.
+| File in `data/` | Original name (used in the project) | Content | In the report |
+|---|---|---|:---:|
+| `olist_orders.xlsx` | `olist_orders_dataset.xlsx` | Order status and timestamps | Yes |
+| `olist_order_items.xlsx` | `olist_order_items_dataset.xlsx` | Seller, product, price, freight, shipping limit | Yes |
+| `olist_customers.xlsx` | `olist_customers_dataset.xlsx` | Customer city and state | Yes |
+| `olist_sellers.xlsx` | `olist_sellers_dataset.xlsx` | Seller city and state | Yes |
+| `olist_products.xlsx` | `olist_products_dataset.xlsx` | Product to category | Yes |
+| `olist_categories.xlsx` | `product_category_name_translation.xlsx` | Category names, Portuguese and English | Yes |
+| `olist_reviews.xlsx` | `olist_order_reviews_dataset.xlsx` | Review score per order | Yes |
+| `olist_payments.xlsx` | `olist_order_payments_dataset.xlsx` | Payment type and value | No |
+| `olist_geolocation.xlsx` | `olist_geolocation_dataset - Copy - Copy.xlsx` | Zip-code coordinates | No |
 
-## Project scope
+The last two files are defined as Power Query queries but no visual uses them. Map coordinates come from a small hidden table of 27 state capitals instead.
 
-**Business question:** where is delivery performance breaking down, and is the cause the seller or the carrier?
+```mermaid
+erDiagram
+    customers ||--o{ orders : customer_id
+    orders ||--o{ order_items : order_id
+    orders ||--o| order_reviews : order_id
+    sellers ||--o{ order_items : seller_id
+    products ||--o{ order_items : product_id
+    Date ||--o{ orders : purchase_date
+```
 
-**In scope**
-- Delivered orders only (status "delivered" with a customer delivery date): 96,470 orders.
-- Four report pages with shared Year, State and Category slicers: Executive Overview, Delivery by Region, Seller & Carrier, Demand & Forecast.
-- On-time delivery, delay by stage (seller handling vs carrier transit), regional and seller rankings, review impact, revenue and freight, demand trends and a 3-month forecast.
-- Ranking rules to avoid small-sample noise: states, months and categories need **500+ delivered orders**; sellers need **30+ orders**.
+## Method
 
-**Out of scope / limitations**
-- Static data: the report is built on Excel files and has no scheduled refresh.
-- No OTIF, and no analysis of payments or geolocation (see data sources below).
-- The map uses approximate state-capital coordinates, not state centroids. It is a scatter-plot bubble map because Power BI's built-in map visuals depend on Bing Maps, which is being retired.
-- The forecast is Power BI's built-in line-chart forecast (3 months, 95% confidence band). It is a rough guide only.
-- The month-of-year chart is not like-for-like: January to August cover two years, September to December only one.
+1. **Prepare (Power Query).** Keep only delivered orders with a customer delivery date (96,470). Join product categories to their English names. Average review score per order: 99,224 raw rows become 95,824 (2,849 orders not delivered, and 551 repeat reviews averaged). The raw tables are never edited.
+2. **Model.** Six relationships (above) plus a calendar `Date` table for September 2016 to October 2018.
+3. **Calculate (DAX).** Delay, stage and flag columns, then 45 measures that drive every number, text and colour on the dashboards. Nothing is hard-coded.
+4. **Rank fairly.** States, months and categories need **500+ delivered orders** to be ranked; sellers need **30+ orders**.
+5. **Verify.** Headline numbers were checked three ways: the report model, independent DAX on the raw tables, and Python on the original CSV files. All match ([results](docs/reconciliation.csv), [queries](docs/verification_queries.dax)).
 
-## Data sources
-
-Source: Olist Brazilian E-Commerce Public Dataset (Kaggle). The nine Excel files are in [`data/`](data/). The file names on GitHub are shortened; the Power BI project still points to the original names shown in the second column.
-
-| File in `data/` | Original file name (used in the project) | What it contains | Used in the report |
-|---|---|---|---|
-| `olist_orders.xlsx` | `olist_orders_dataset.xlsx` | Order status and timestamps (purchase, carrier, delivery, estimate) | Yes: `orders` table (delivered only) |
-| `olist_order_items.xlsx` | `olist_order_items_dataset.xlsx` | Items per order: seller, product, price, freight, shipping limit | Yes: `order_items` |
-| `olist_customers.xlsx` | `olist_customers_dataset.xlsx` | Customer city and state | Yes: `customers` |
-| `olist_sellers.xlsx` | `olist_sellers_dataset.xlsx` | Seller city and state | Yes: `sellers` |
-| `olist_products.xlsx` | `olist_products_dataset.xlsx` | Product to category | Yes: `products` |
-| `olist_categories.xlsx` | `product_category_name_translation.xlsx` | Category names in Portuguese and English | Yes: joined into `products` |
-| `olist_reviews.xlsx` | `olist_order_reviews_dataset.xlsx` | Review score per order | Yes: `order_reviews` (average per order) |
-| `olist_payments.xlsx` | `olist_order_payments_dataset.xlsx` | Payment type and value | No: defined as a query, not used by any visual |
-| `olist_geolocation.xlsx` | `olist_geolocation_dataset - Copy - Copy.xlsx` | Zip-code coordinates | No: defined as a query, not used by any visual (map coordinates come from a small state table instead) |
-
-## Calculations used
-
-All logic is in Power Query, calculated columns and DAX measures. The raw tables are never edited. Full code: [`docs/measures.dax`](docs/measures.dax).
-
-**Power Query (data preparation)**
-- Keep only delivered orders with a customer delivery date, shared by the orders, items and reviews tables.
-- Join product categories to their English names (fall back to the Portuguese name, then "Unknown").
-- Average review score per order (551 repeat reviews are averaged): 99,224 raw rows become 95,824 clean rows.
-
-**Calculated columns**
+<details>
+<summary><b>Calculated columns</b></summary>
 
 | Column | Logic |
 |---|---|
 | `Delivery Days` | delivered date − purchase date (whole days) |
-| `Is Late` / `Delivery Status` | 1 / "Late" when delivered date is after the estimated date |
+| `Is Late` / `Delivery Status` | late when delivered date is after the estimated date |
 | `Delay Days` | days after the estimate, never below 0 |
 | `Seller Handling Days` | carrier pick-up date − purchase date |
 | `Carrier Transit Days` | customer delivery date − carrier pick-up date |
@@ -171,55 +155,71 @@ All logic is in Power Query, calculated columns and DAX measures. The raw tables
 | `State Name` | state code to state name |
 | `Seller Short` | first 8 characters of the seller ID (unique across all 3,095 sellers) |
 
-**DAX measures (45), by group**
-- **Delivery:** Delivered Orders, Late Delivery %, On-Time Delivery %, Avg Delivery Days, Avg Delay (Late Orders), Avg Seller Handling, Avg Carrier Transit.
-- **Reviews:** Avg Review Score, Review Score (Late), Review Score (On-Time).
-- **Revenue and freight:** Revenue, Revenue (M), Freight Cost, Freight % of Revenue.
-- **Sellers:** Seller Orders, Late Handoff %, Seller On-Time Handoff %, Seller Rank Key, Seller Rank (Top / Bottom) with the 30-order rule.
-- **500+ rules and rankings:** Late Rank (500+ States), Qualifying State Count, Show State (Top 6 + Bottom 3), Month In Window, Month OTD Rank (Lowest), Late % (States 500+), Late % (Highest 6 / Other States), OTD (Lowest 3 Months).
-- **Map:** Map Lat, Map Lng (lookup in a small hidden table of 27 state coordinates).
-- **Dynamic text and colours:** key-findings text, KPI sub-labels, chart titles, bar and marker colours, and a safety-stock note (1.65 × standard deviation of delivery days for a 95% service level).
+</details>
 
-**Model:** relationships from `orders` to `customers`, `order_items` to `orders`, `order_reviews` to `orders`, `order_items` to `sellers`, `order_items` to `products`, and `orders` to a calendar `Date` table (September 2016 to October 2018).
+<details>
+<summary><b>DAX measures (45), by group</b></summary>
 
-**Verification:** the headline numbers were checked three ways: the report model, independent DAX on the raw tables, and Python on the original CSV files. All match. See [`docs/reconciliation.csv`](docs/reconciliation.csv) and [`docs/verification_queries.dax`](docs/verification_queries.dax).
+- **Delivery:** Delivered Orders, Late Delivery %, On-Time Delivery %, Avg Delivery Days, Avg Delay (Late Orders), Avg Seller Handling, Avg Carrier Transit
+- **Reviews:** Avg Review Score, Review Score (Late), Review Score (On-Time)
+- **Revenue and freight:** Revenue, Revenue (M), Freight Cost, Freight % of Revenue
+- **Sellers:** Seller Orders, Late Handoff %, Seller On-Time Handoff %, Seller Rank Key, Seller Rank (Top / Bottom)
+- **Rules and rankings:** Late Rank (500+ States), Qualifying State Count, Show State (Top 6 + Bottom 3), Month In Window, Month OTD Rank (Lowest), Late % (States 500+), Late % (Highest 6 / Other States), OTD (Lowest 3 Months)
+- **Map:** Map Lat, Map Lng
+- **Dynamic text and colour:** key-findings text, KPI sub-labels, chart titles, bar and marker colours, safety-stock note (1.65 × standard deviation of delivery days)
 
-## Tools and technologies
+Full code: [`docs/measures.dax`](docs/measures.dax)
 
-- **Power BI Desktop**: report design, data model, PBIP project format (TMDL and PBIR text files)
-- **Power Query (M)**: data preparation
-- **DAX**: calculated columns and measures
-- **Microsoft Excel files**: data sources
-- **Python**: independent verification against the original CSV files
-- **Git and GitHub**: version control, hosting
-- **HTML and CSS with GitHub Pages**: portfolio page
+```dax
+Seller Rank (Top) =
+IF([Seller Orders] >= 30,
+   RANKX(FILTER(ALLSELECTED(sellers[Seller Short]), [Seller Orders] >= 30),
+         [Seller Rank Key], , DESC, DENSE))
+```
 
-## Project files
+</details>
+
+## Scope and limitations
+
+**In scope:** delivered orders only; four report pages; on-time delivery, delay by stage, regional and seller rankings, review impact, revenue and freight, demand and a 3-month forecast.
+
+**Limitations**
+- Static data: built on Excel files, with no scheduled refresh.
+- OTD only (no OTIF), and no analysis of payments or geolocation.
+- The map is a scatter-plot bubble map on approximate state-capital coordinates (checked against IBGE data, all within about 0.1 degree), because Power BI's built-in maps depend on Bing Maps, which is being retired.
+- The forecast is rough, and the month-of-year chart is not like-for-like (see Dashboard 4).
+- Findings show patterns and association, not proven causes.
+
+## Tools
+
+Power BI Desktop (PBIP project, TMDL and PBIR text files) · Power Query (M) · DAX · Excel (sources) · Python (verification) · Git and GitHub · HTML and CSS on GitHub Pages (portfolio page)
+
+## Repository
 
 ```
 README.md
-index.html                       portfolio page (also served by GitHub Pages)
+index.html                       portfolio page (served by GitHub Pages)
 Olist_Delivery_Dashboard.pbix    report file, data included
 Olist_Dashboard.pdf              the report as a PDF
 images/                          the four report pages in 4K
-data/                            the nine Olist source Excel files
-powerbi/                         Power BI project source (PBIP)
+data/                            the nine source Excel files
+powerbi/                         project source (PBIP)
   Olist_Delivery_Dashboard.pbip
   Olist_Delivery_Dashboard.Report/          pages, visuals, theme
   Olist_Delivery_Dashboard.SemanticModel/   tables, relationships, measures (TMDL)
 docs/
   measures.dax                   all 45 DAX measures
   verification_queries.dax       independent checks
-  reconciliation.csv             A / B / C comparison results
+  reconciliation.csv             report vs raw-table vs Python results
   MODEL_NOTES.md                 model notes and known gaps
-  Olist_Theme.json               report colour theme
+  Olist_Theme.json               colour theme
 ```
 
 ## Open the report
 
-**Quickest:** download `Olist_Delivery_Dashboard.pbix` and open it in Power BI Desktop. The data is already inside the file.
+**Quickest:** download [`Olist_Delivery_Dashboard.pbix`](Olist_Delivery_Dashboard.pbix) and open it in Power BI Desktop. The data is inside the file.
 
-**Or open the project source:**
+**Project source:**
 1. In Power BI Desktop, enable the **Power BI Project (.pbip)** preview feature.
 2. Open `powerbi/Olist_Delivery_Dashboard.pbip`.
 3. Point the data sources to your local copy of `data/` (Transform data, then Data source settings). The project's original paths are `C:\Users\isc\OneDrive\Attachments\`, with the original file names listed above.
@@ -227,4 +227,6 @@ docs/
 
 ## Author
 
-**Mohammed Aref Sultan** – Power BI / data analytics. GitHub: [mohdaref12345-hash](https://github.com/mohdaref12345-hash)
+**Mohammed Aref Sultan** · Power BI and data analytics · [GitHub](https://github.com/mohdaref12345-hash)
+
+Data: Olist Brazilian E-Commerce Public Dataset (Kaggle).
