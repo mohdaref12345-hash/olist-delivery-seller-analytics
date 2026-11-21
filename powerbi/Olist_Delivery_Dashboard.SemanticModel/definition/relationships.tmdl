@@ -1,0 +1,25 @@
+relationship rel_orders_customers
+	fromColumn: orders.customer_id
+	toColumn: customers.customer_id
+
+relationship rel_items_orders
+	crossFilteringBehavior: bothDirections
+	fromColumn: order_items.order_id
+	toColumn: orders.order_id
+
+relationship rel_reviews_orders
+	fromColumn: order_reviews.order_id
+	toColumn: orders.order_id
+
+relationship rel_items_sellers
+	fromColumn: order_items.seller_id
+	toColumn: sellers.seller_id
+
+relationship rel_items_products
+	fromColumn: order_items.product_id
+	toColumn: products.product_id
+
+relationship rel_orders_date
+	fromColumn: orders.purchase_date
+	toColumn: Date.Date
+

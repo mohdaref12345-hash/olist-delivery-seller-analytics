@@ -1,0 +1,13 @@
+metric,A_report_model,B_raw_tables_independent_DAX,C_python_on_original_CSV,difference_A_minus_B,status
+Delivered orders,96470,96470,96470,0,MATCH
+On-Time Delivery (OTD),0.9188763346117964,0.9188763346117964,0.91888,0,MATCH
+Avg delivery days (INT),12.093604229294082,12.093604229294082,12.0936,0,MATCH
+Avg delay late orders (days),8.866854076156402,8.866854076156402,8.8669,0,MATCH
+Revenue,13220248.930000005,13220248.930000037,13220248.93,-3.2e-08 (floating point),MATCH
+Freight cost,2198145.9,2198145.9,2198145.9,0,MATCH
+Freight % of revenue,0.1662711429746126,0.16627114297461218,0.16627,~4e-16 (floating point),MATCH
+Order items (delivered),110189,110189,,0,MATCH
+Avg review score (per-order average),4.156157817109145,,4.15616,,MATCH vs python
+Review score late orders,2.566505678109907,,2.5665,,MATCH vs python
+Review score on-time orders,4.2943,,4.2943,,MATCH vs python
+Seller late hand-off %,0.0932,,0.093195,,MATCH vs python

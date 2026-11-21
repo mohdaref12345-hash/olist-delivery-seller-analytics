@@ -1,0 +1,52 @@
+table Date
+	lineageTag: 9ecf44d5-8781-4cdf-a22d-06dc61cf5d3c
+	dataCategory: Time
+
+	column Date
+		isUnique
+		lineageTag: 888a85c3-eef8-4f16-95a7-5d557a2262dc
+		isNameInferred
+		sourceColumn: [Date]
+
+	column Year
+		lineageTag: 687e5d75-1423-4d3b-91bc-f5c6b152958a
+		isNameInferred
+		sourceColumn: [Year]
+
+	column 'Month Number'
+		lineageTag: e5d9b7ac-8dc3-415b-8284-96d80eb4dec0
+		isNameInferred
+		sourceColumn: [Month Number]
+
+	column Month
+		lineageTag: 26ed4d1d-06b5-4996-9fbd-765b1ae08b5e
+		isNameInferred
+		sourceColumn: [Month]
+		sortByColumn: 'Month Number'
+
+	column Year-Month
+		lineageTag: 7754469c-31e3-470c-b7d1-72139db2e332
+		isNameInferred
+		sourceColumn: [Year-Month]
+
+	column 'Month Start'
+		formatString: mmm yyyy
+		lineageTag: fd07e0a5-7f0f-4c47-9895-5a7de0876ee4
+		isNameInferred
+		sourceColumn: [Month Start]
+
+	column 'Weekday Number'
+		lineageTag: fba90032-d472-4620-b240-b3ce7027da9b
+		isNameInferred
+		sourceColumn: [Weekday Number]
+
+	column Weekday
+		lineageTag: c9a49a1e-4509-4aef-bb96-e306e59c3160
+		isNameInferred
+		sourceColumn: [Weekday]
+		sortByColumn: 'Weekday Number'
+
+	partition Date = calculated
+		mode: import
+		source = ADDCOLUMNS(CALENDAR(DATE(2016,9,1), DATE(2018,10,31)), "Year", YEAR([Date]), "Month Number", MONTH([Date]), "Month", FORMAT([Date], "MMM"), "Year-Month", FORMAT([Date], "YYYY-MM"), "Month Start", DATE(YEAR([Date]), MONTH([Date]), 1), "Weekday Number", WEEKDAY([Date], 2), "Weekday", FORMAT([Date], "ddd"))
+

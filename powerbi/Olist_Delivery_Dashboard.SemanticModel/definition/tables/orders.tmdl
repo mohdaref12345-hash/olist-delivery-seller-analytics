@@ -1,0 +1,96 @@
+table orders
+	lineageTag: d20d7b06-1e98-46f2-ad91-28057c38951c
+
+	column order_id
+		dataType: string
+		lineageTag: 2e61edb3-1acf-4e64-b15d-a31ebd4f0d4b
+		sourceColumn: order_id
+
+	column customer_id
+		dataType: string
+		lineageTag: 2968cc00-f5e5-48d3-8d82-588a73da661a
+		sourceColumn: customer_id
+
+	column order_status
+		dataType: string
+		lineageTag: fc2d9527-51e5-4b53-8e2b-904f3f1f52e5
+		sourceColumn: order_status
+
+	column order_purchase_timestamp
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 0155754e-d032-48a0-a36c-1ea0620fe0db
+		sourceColumn: order_purchase_timestamp
+
+	column order_delivered_carrier_date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 57b8f77d-f136-4520-9140-1c371ff9782a
+		sourceColumn: order_delivered_carrier_date
+
+	column order_delivered_customer_date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 0dccbec3-07ed-4f46-8b12-e004e7aa186c
+		sourceColumn: order_delivered_customer_date
+
+	column order_estimated_delivery_date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 29b25499-9826-441d-a3c2-cdbc8ef8be3e
+		sourceColumn: order_estimated_delivery_date
+
+	column purchase_date
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: 88380d2c-9d7a-419c-b366-0dc1ba988356
+		summarizeBy: none
+		sourceColumn: purchase_date
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Delivery Days' = INT(orders[order_delivered_customer_date] - orders[order_purchase_timestamp])
+		dataType: int64
+		formatString: 0
+		lineageTag: 9b7f2fc7-7d1a-4707-86c9-9021b67ab6bb
+		summarizeBy: none
+
+	column 'Is Late' = IF(orders[order_delivered_customer_date] > orders[order_estimated_delivery_date], 1, 0)
+		dataType: int64
+		formatString: 0
+		lineageTag: 72ed43b3-de1e-42ff-9486-983918601d95
+		summarizeBy: none
+
+	column 'Delivery Status' = IF(orders[order_delivered_customer_date] > orders[order_estimated_delivery_date], "Late", "On-time")
+		dataType: string
+		lineageTag: c2379fe2-e054-4e94-b527-70ba1b865656
+		summarizeBy: none
+
+	column 'Delay Days' = MAX(0, INT(orders[order_delivered_customer_date] - orders[order_estimated_delivery_date]))
+		dataType: int64
+		formatString: 0
+		lineageTag: 2294360f-680e-45f3-98d6-302ddc3667ea
+		summarizeBy: none
+
+	column 'Seller Handling Days' = IF(ISBLANK(orders[order_delivered_carrier_date]), BLANK(), INT(orders[order_delivered_carrier_date] - orders[order_purchase_timestamp]))
+		dataType: int64
+		formatString: 0
+		lineageTag: ebd9a23d-ea7f-4027-9bee-d7da9515c875
+		summarizeBy: none
+
+	column 'Carrier Transit Days' = IF(ISBLANK(orders[order_delivered_carrier_date]), BLANK(), INT(orders[order_delivered_customer_date] - orders[order_delivered_carrier_date]))
+		dataType: int64
+		formatString: 0
+		lineageTag: 3a4af06e-e599-4e05-ada5-d4a03beb0e98
+		summarizeBy: none
+
+	partition orders = m
+		mode: import
+		source =
+				let
+				    Source = q_orders_delivered
+				in
+				    Source
+

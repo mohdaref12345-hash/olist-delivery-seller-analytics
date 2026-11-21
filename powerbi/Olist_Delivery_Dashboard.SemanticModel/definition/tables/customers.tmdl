@@ -1,0 +1,41 @@
+table customers
+	lineageTag: 33c8740b-ae7f-42f6-97ce-4f39859c88e6
+
+	column customer_id
+		dataType: string
+		lineageTag: 83459ecf-e531-46ac-97b2-941233d7a51c
+		sourceColumn: customer_id
+
+	column customer_city
+		dataType: string
+		lineageTag: 542aa50d-0e0c-4587-a4ff-d0392088b0eb
+		sourceColumn: customer_city
+
+	column customer_state
+		dataType: string
+		lineageTag: 2c936bf8-8e56-449c-b829-1a7733446302
+		sourceColumn: customer_state
+
+	column 'State Name' = SWITCH(customers[customer_state], "AC","Acre", "AL","Alagoas", "AM","Amazonas", "AP","Amapá", "BA","Bahia", "CE","Ceará", "DF","Distrito Federal", "ES","Espírito Santo", "GO","Goiás", "MA","Maranhão", "MG","Minas Gerais", "MS","Mato Grosso do Sul", "MT","Mato Grosso", "PA","Pará", "PB","Paraíba", "PE","Pernambuco", "PI","Piauí", "PR","Paraná", "RJ","Rio de Janeiro", "RN","Rio Grande do Norte", "RO","Rondônia", "RR","Roraima", "RS","Rio Grande do Sul", "SC","Santa Catarina", "SE","Sergipe", "SP","São Paulo", "TO","Tocantins", customers[customer_state])
+		dataType: string
+		lineageTag: 35d03ad5-d1df-47f6-9bc3-e0546e4bd702
+		summarizeBy: none
+
+	column 'State Location' = customers[State Name] & ", Brazil"
+		dataType: string
+		lineageTag: 2c5cbe72-9eac-4c1a-baf5-a166668e0287
+		dataCategory: StateOrProvince
+		summarizeBy: none
+
+	partition customers = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(File.Contents("C:\Users\isc\OneDrive\Attachments\olist_customers_dataset.xlsx"), null, true),
+				    Sheet = Source{[Item="olist_customers_dataset",Kind="Sheet"]}[Data],
+				    Promoted = Table.PromoteHeaders(Sheet, [PromoteAllScalars=true]),
+				    Typed = Table.TransformColumnTypes(Promoted,{{"customer_id", type text}, {"customer_city", type text}, {"customer_state", type text}}),
+				    Keep = Table.SelectColumns(Typed, {"customer_id", "customer_city", "customer_state"})
+				in
+				    Keep
+

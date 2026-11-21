@@ -1,0 +1,243 @@
+table _Measures
+	lineageTag: dfe90e56-7e4f-49bf-869e-0ffb57e8714f
+
+	measure 'Delivered Orders' = DISTINCTCOUNT(orders[order_id])
+		formatString: #,0
+		displayFolder: 1 Core
+		lineageTag: 31e328dd-8bcd-40df-bd79-45d55144b38e
+
+	measure 'Late Delivery %' = AVERAGE(orders[Is Late])
+		formatString: 0.0%
+		displayFolder: 1 Core
+		lineageTag: 1fed4fe7-17ff-4f2f-b9da-40245f8ac71d
+
+	measure 'On-Time Delivery %' = 1 - AVERAGE(orders[Is Late])
+		formatString: 0.0%
+		displayFolder: 1 Core
+		lineageTag: 0147ad2d-b27b-4ece-ba95-a8ac4e4e3f81
+
+	measure 'Avg Delivery Days' = AVERAGE(orders[Delivery Days])
+		formatString: 0.0
+		displayFolder: 1 Core
+		lineageTag: 275b1559-c32f-486e-883e-fe6026ea8674
+
+	measure 'Avg Delay (Late Orders)' = CALCULATE(AVERAGE(orders[Delay Days]), orders[Is Late] = 1)
+		formatString: 0.0
+		displayFolder: 1 Core
+		lineageTag: bb2a2373-4bef-4a04-8386-6588421125e4
+
+	measure 'Avg Review Score' = AVERAGE(order_reviews[review_score])
+		formatString: 0.00
+		displayFolder: 1 Core
+		lineageTag: 7626d822-6db9-407d-a4d7-b20e888028a5
+
+	measure 'Review Score (Late)' = CALCULATE([Avg Review Score], orders[Is Late] = 1)
+		formatString: 0.00
+		displayFolder: 1 Core
+		lineageTag: d1bb3750-7963-421d-a27a-e6b40de30824
+
+	measure 'Review Score (On-Time)' = CALCULATE([Avg Review Score], orders[Is Late] = 0)
+		formatString: 0.00
+		displayFolder: 1 Core
+		lineageTag: 5826d485-d377-4b54-b37b-354f51bad604
+
+	measure 'Avg Seller Handling' = AVERAGE(orders[Seller Handling Days])
+		formatString: 0.0
+		displayFolder: 1 Core
+		lineageTag: 902f9e71-a22b-410a-9850-745aa7565bd2
+
+	measure 'Avg Carrier Transit' = AVERAGE(orders[Carrier Transit Days])
+		formatString: 0.0
+		displayFolder: 1 Core
+		lineageTag: 0d5da130-5de8-466a-ae62-5eaeed6b4847
+
+	measure Revenue = SUM(order_items[price])
+		formatString: #,0
+		displayFolder: 1 Core
+		lineageTag: e96a7412-237e-46f1-a39e-4e21b545550f
+
+	measure 'Revenue (M)' = DIVIDE([Revenue], 1000000)
+		formatString: 0.0"M"
+		displayFolder: 1 Core
+		lineageTag: 7cba5ee5-b395-451e-b8ec-0b92a227e215
+
+	measure 'Freight Cost' = SUM(order_items[freight_value])
+		formatString: #,0
+		displayFolder: 1 Core
+		lineageTag: 82910c3b-8ad9-4eca-81d4-6954bb1672b4
+
+	measure 'Freight % of Revenue' = DIVIDE([Freight Cost], [Revenue])
+		formatString: 0.0%
+		displayFolder: 1 Core
+		lineageTag: 802a00dc-1c7a-4b19-81d4-4108f669a3c4
+
+	measure 'Seller Orders' = DISTINCTCOUNT(order_items[order_id])
+		formatString: #,0
+		displayFolder: 2 Seller
+		lineageTag: 974a9f89-1367-4f65-a38d-6be1620c27e1
+
+	measure 'Late Handoff %' = AVERAGE(order_items[Seller Late Handoff Flag])
+		formatString: 0.00%
+		displayFolder: 2 Seller
+		lineageTag: b6ae2324-f5b6-4a8a-bb45-a38a37529208
+
+	measure 'Seller On-Time Handoff %' = 1 - AVERAGE(order_items[Seller Late Handoff Flag])
+		formatString: 0.0%
+		displayFolder: 2 Seller
+		lineageTag: ea43ba4c-87b0-4a77-94ac-d644cee9d854
+
+	measure 'Seller Rank Key' = [Seller On-Time Handoff %] + [Seller Orders] / 10000000
+		formatString: 0.0000000
+		displayFolder: 2 Seller
+		lineageTag: d278c9ba-a405-4414-8f32-c2bd90610f72
+
+	measure 'Seller Rank (Top)' = IF([Seller Orders] >= 30, RANKX(FILTER(ALLSELECTED(sellers[Seller Short]), [Seller Orders] >= 30), [Seller Rank Key], , DESC, DENSE))
+		formatString: 0
+		displayFolder: 2 Seller
+		lineageTag: 28aab756-de17-4521-bd04-0e2658d2c715
+
+	measure 'Seller Rank (Bottom)' = IF([Seller Orders] >= 30, RANKX(FILTER(ALLSELECTED(sellers[Seller Short]), [Seller Orders] >= 30), [Seller Rank Key], , ASC, DENSE))
+		formatString: 0
+		displayFolder: 2 Seller
+		lineageTag: 6271aaea-c33e-46ce-a5bf-cb19d3c89a2d
+
+	measure 'Qualifying State Count' = COUNTROWS(FILTER(ALLSELECTED(customers[customer_state]), [Delivered Orders] >= 500))
+		formatString: 0
+		displayFolder: 3 Helpers
+		lineageTag: ed5f9e59-0af8-44da-b1d8-1650a122b234
+
+	measure 'Late Rank (500+ States)' = IF([Delivered Orders] >= 500, RANKX(FILTER(ALLSELECTED(customers[customer_state]), [Delivered Orders] >= 500), [Late Delivery %], , DESC, DENSE))
+		formatString: 0
+		displayFolder: 3 Helpers
+		lineageTag: 92407319-9e2c-4aaa-a19a-23a41e040c1c
+
+	measure 'Show State (Top 6 + Bottom 3)' = VAR r = [Late Rank (500+ States)] VAR n = [Qualifying State Count] RETURN IF(NOT ISBLANK(r) && (r <= 6 || r > n - 3), 1, 0)
+		formatString: 0
+		displayFolder: 3 Helpers
+		lineageTag: 2ed30a94-21a4-4079-8cb5-a716306303f9
+
+	measure 'State Bar Color' = IF([Late Rank (500+ States)] <= 6, "#EA580C", "#0F766E")
+		displayFolder: 3 Helpers
+		lineageTag: 3c26585e-0ec7-4a60-90b6-22df7d463052
+
+	measure 'Month In Window' = IF([Delivered Orders] >= 500, 1, 0)
+		formatString: 0
+		displayFolder: 3 Helpers
+		lineageTag: 60e3e199-a8f5-4ef9-a577-d3e7f67cf8c4
+
+	measure 'Month OTD Rank (Lowest)' = IF([Month In Window] = 1, RANKX(FILTER(ALLSELECTED('Date'[Month Start]), [Delivered Orders] >= 500), [On-Time Delivery %], , ASC, DENSE))
+		formatString: 0
+		displayFolder: 3 Helpers
+		lineageTag: c24c610b-4a1d-4c4e-8d74-bf5d7053f9ef
+
+	measure 'Low Month Marker Color' = VAR r = [Month OTD Rank (Lowest)] RETURN IF(NOT ISBLANK(r) && r <= 3, "#EA580C", "#0F766E")
+		displayFolder: 3 Helpers
+		lineageTag: bae5a2f3-4491-4c15-83ab-b45e0b8708ab
+
+	measure 'Sub: Late % Text' = FORMAT([Late Delivery %], "0.0%") & " late"
+		displayFolder: 4 Text
+		lineageTag: 121a1bd8-76e1-4b3b-84b4-1fdd1fd7095a
+
+	measure 'Sub: Review Text' = "late " & FORMAT([Review Score (Late)], "0.00") & " vs on-time " & FORMAT([Review Score (On-Time)], "0.00")
+		displayFolder: 4 Text
+		lineageTag: f2cf5eee-61cb-4d89-9e81-09ec997866f1
+
+	measure 'Sub: Revenue Text' = FORMAT([Delivered Orders], "#,0") & " delivered orders"
+		displayFolder: 4 Text
+		lineageTag: cd9d9568-d375-4d7b-a807-d9aaf9b5c263
+
+	measure 'Sub: Avg Delivery Text' = "purchase to door"
+		displayFolder: 4 Text
+		lineageTag: 5915d6df-a3b3-431f-b67a-46c0879e5687
+
+	measure 'Sub: Avg Delay Text' = "late orders only"
+		displayFolder: 4 Text
+		lineageTag: 20bade04-5b8d-4e74-981b-0d5946dd69c3
+
+	measure 'Avg Review Card' = FORMAT([Avg Review Score], "0.00") & " / 5"
+		displayFolder: 4 Text
+		lineageTag: f7b6a559-4cc2-45b9-8fc4-52d97ce747d7
+
+	measure 'Avg Delivery Card' = FORMAT([Avg Delivery Days], "0.0") & " days"
+		displayFolder: 4 Text
+		lineageTag: caf3ce49-79b9-4547-9b83-ceab16593af9
+
+	measure 'Avg Delay Card' = FORMAT([Avg Delay (Late Orders)], "0.0") & " days"
+		displayFolder: 4 Text
+		lineageTag: f1a54d79-914c-4c55-b3b5-737931a314ea
+
+	measure 'Footer Text' = "Public Olist dataset (Kaggle), " & FORMAT(CALCULATE([Delivered Orders], REMOVEFILTERS()), "#,0") & " delivered orders"
+		displayFolder: 4 Text
+		lineageTag: c2cb6b00-1f59-429d-af31-fda9d15a5880
+
+	measure 'Month Chart Title' =
+			VAR m = FILTER(ALLSELECTED('Date'[Month Start]), [Delivered Orders] >= 500)
+			RETURN IF(COUNTROWS(m) = 0, "On-time delivery % by month (no month has 500+ delivered orders in this selection)", "On-time delivery % by month (" & FORMAT(MINX(m, 'Date'[Month Start]), "mmm yyyy") & " - " & FORMAT(MAXX(m, 'Date'[Month Start]), "mmm yyyy") & ")")
+		displayFolder: 4 Text
+		lineageTag: abc3453a-2519-4dd7-aaf7-1428dd04abbe
+
+	measure 'Key Findings' =
+			VAR states = FILTER(ALLSELECTED(customers[customer_state]), [Delivered Orders] >= 500)
+			VAR worstCode = MAXX(TOPN(1, states, [Late Delivery %], DESC), customers[customer_state])
+			VAR bigCode = MAXX(TOPN(1, states, [Delivered Orders], DESC), customers[customer_state])
+			VAR worstName = LOOKUPVALUE(customers[State Name], customers[customer_state], worstCode)
+			VAR bigName = LOOKUPVALUE(customers[State Name], customers[customer_state], bigCode)
+			VAR worstRate = CALCULATE([Late Delivery %], customers[customer_state] = worstCode)
+			VAR bigRate = CALCULATE([Late Delivery %], customers[customer_state] = bigCode)
+			VAR cLate = CALCULATE([Avg Carrier Transit], orders[Is Late] = 1)
+			VAR cOn = CALCULATE([Avg Carrier Transit], orders[Is Late] = 0)
+			VAR sLate = CALCULATE([Avg Seller Handling], orders[Is Late] = 1)
+			VAR sOn = CALCULATE([Avg Seller Handling], orders[Is Late] = 0)
+			VAR carrierDrives = (cLate - cOn) >= (sLate - sOn)
+			VAR opening = IF(carrierDrives, "Carrier transit, not seller handling, drives late orders: ", "Seller handling, not carrier transit, drives late orders: ")
+			VAR a = IF(carrierDrives, cLate, sLate)
+			VAR b = IF(carrierDrives, cOn, sOn)
+			VAR part1 = opening & FORMAT(a, "0.0") & " days versus " & FORMAT(b, "0.0") & " for on-time ones. "
+			VAR part2 = IF(COUNTROWS(states) = 0, "No state has 500+ delivered orders in this selection, so no state comparison is shown. ", worstName & " has the highest late rate at " & FORMAT(worstRate, "0.0%") & " against " & FORMAT(bigRate, "0.0%") & " in " & bigName & ", and ")
+			VAR part3 = IF(COUNTROWS(states) = 0, "Late orders", "late orders") & " score " & FORMAT([Review Score (Late)], "0.00") & " in reviews versus " & FORMAT([Review Score (On-Time)], "0.00") & "."
+			RETURN IF(ISBLANK(a) && ISBLANK(b), "Not enough delivered orders in this selection.", part1 & part2 & part3)
+		displayFolder: 4 Text
+		lineageTag: e9abc81b-1e4a-4695-95df-0a3b937f5b5e
+
+	measure 'OTD (Lowest 3 Months)' = VAR r = [Month OTD Rank (Lowest)] RETURN IF(NOT ISBLANK(r) && r <= 3, [On-Time Delivery %])
+		formatString: 0.0%
+		displayFolder: 3 Helpers
+		lineageTag: 0bd0f37f-4d4a-4541-b0f8-b10efba6a73c
+
+	measure 'Late % (Highest 6 States)' = IF([Late Rank (500+ States)] <= 6, [Late Delivery %])
+		formatString: 0.0%
+		displayFolder: 3 Helpers
+		lineageTag: bfc8a75d-c3f7-4116-ac37-a778f1b084fa
+
+	measure 'Late % (Other States)' = IF([Late Rank (500+ States)] > 6, [Late Delivery %])
+		formatString: 0.0%
+		displayFolder: 3 Helpers
+		lineageTag: 90f0e155-adec-464c-b5dc-69fc55942847
+
+	measure 'Safety Stock Text' = VAR sd = STDEV.P(orders[Delivery Days]) VAR avgd = [Avg Delivery Days] RETURN "Delivery time averages " & FORMAT(avgd, "0.0") & " days but varies by " & FORMAT(sd, "0.0") & " days (standard deviation). For a 95% service level, plan about " & FORMAT(1.65 * sd, "0.0") & " extra days of demand as safety stock (1.65 x standard deviation)."
+		displayFolder: 4 Text
+		lineageTag: 5a0b8bf5-eb67-4e90-81e9-6900ae549fc3
+
+	measure 'Map Lat' = VAR s = SELECTEDVALUE(customers[customer_state]) RETURN IF(NOT ISBLANK(s), CALCULATE(MAX(state_geo[lat]), state_geo[state] = s))
+		formatString: 0.00
+		isHidden
+		lineageTag: 9fc2b0de-d570-48f5-bb23-a6feaa96e449
+
+	measure 'Map Lng' = VAR s = SELECTEDVALUE(customers[customer_state]) RETURN IF(NOT ISBLANK(s), CALCULATE(MAX(state_geo[lng]), state_geo[state] = s))
+		formatString: 0.00
+		isHidden
+		lineageTag: 93d64130-ce4f-408f-acf4-a742cf543a8c
+
+	measure 'Late % (States 500+)' = IF([Delivered Orders] >= 500, [Late Delivery %])
+		formatString: 0.0%
+		lineageTag: 2adf0ca5-716d-4b61-a46f-1ff89d841721
+
+	column Placeholder
+		lineageTag: 67449a9c-5bd1-4e7f-8095-ffc38f73f043
+		isNameInferred
+		sourceColumn: [Placeholder]
+
+	partition _Measures = calculated
+		mode: import
+		source = ROW("Placeholder", BLANK())
+

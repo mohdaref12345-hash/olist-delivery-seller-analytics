@@ -1,0 +1,31 @@
+// ---- A: report model (measures) ----
+EVALUATE ROW("A_orders",[Delivered Orders],"A_otd",[On-Time Delivery %],"A_avg_del",[Avg Delivery Days],"A_avg_delay",[Avg Delay (Late Orders)],"A_rev",[Revenue],"A_freight",[Freight Cost],"A_freight_pct",[Freight % of Revenue],"A_items",COUNTROWS(order_items))
+
+// ---- B: untouched raw_* tables, independent logic ----
+EVALUATE
+VAR del = FILTER(raw_orders, raw_orders[order_status]="delivered" && NOT ISBLANK(raw_orders[order_delivered_customer_date]))
+VAR n = COUNTROWS(del)
+VAR lateT = FILTER(del, raw_orders[order_delivered_customer_date] > raw_orders[order_estimated_delivery_date])
+VAR ids = SELECTCOLUMNS(del, "id", raw_orders[order_id])
+VAR items = FILTER(raw_order_items, raw_order_items[order_id] IN ids)
+VAR rev = SUMX(items, raw_order_items[price])
+VAR fr = SUMX(items, raw_order_items[freight_value])
+RETURN ROW("B_orders", n, "B_otd", 1 - DIVIDE(COUNTROWS(lateT), n), "B_avg_del", AVERAGEX(del, INT(raw_orders[order_delivered_customer_date] - raw_orders[order_purchase_timestamp])), "B_avg_delay", AVERAGEX(lateT, INT(raw_orders[order_delivered_customer_date] - raw_orders[order_estimated_delivery_date])), "B_rev", rev, "B_freight", fr, "B_freight_pct", DIVIDE(fr, rev), "B_items", COUNTROWS(items))
+
+// ---- Slicer behaviour (Category / Year / State change the KPIs) ----
+EVALUATE ROW("OTD all",[On-Time Delivery %],"OTD health_beauty",CALCULATE([On-Time Delivery %],products[category]="health_beauty"),"Review health_beauty",CALCULATE([Avg Review Score],products[category]="health_beauty"),"OTD 2017",CALCULATE([On-Time Delivery %],'Date'[Year]=2017),"OTD SP",CALCULATE([On-Time Delivery %],customers[customer_state]="SP"))
+
+// ---- 3 lowest-OTD months (window = months with >= 500 orders) ----
+EVALUATE SUMMARIZECOLUMNS('Date'[Month Start], "orders",[Delivered Orders], "rank",[Month OTD Rank (Lowest)], "otd",[On-Time Delivery %]) ORDER BY 'Date'[Month Start]
+
+// ---- raw_order_reviews: no bad rows; 3,400 row gap = 2,849 non-delivered orders + 551 repeat reviews ----
+EVALUATE ROW("raw_rows",COUNTROWS(raw_order_reviews),"clean_rows",COUNTROWS(order_reviews),"raw_distinct_orders",DISTINCTCOUNT(raw_order_reviews[order_id]),"clean_distinct_orders",DISTINCTCOUNT(order_reviews[order_id]))
+
+// ---- 500+ order threshold coverage ----
+EVALUATE ROW("states_500",COUNTROWS(FILTER(VALUES(customers[customer_state]),[Delivered Orders]>=500)),"cats_500",COUNTROWS(FILTER(VALUES(products[category]),[Delivered Orders]>=500)),"months_500",COUNTROWS(FILTER(VALUES('Date'[Month Start]),[Delivered Orders]>=500)))
+
+// ---- Page 3 top-10 sellers (Seller Short is unique: 3,095 of 3,095) ----
+EVALUATE FILTER(ADDCOLUMNS(VALUES(sellers[Seller Short]),"orders",[Seller Orders],"otd",[Seller On-Time Handoff %],"rank",[Seller Rank (Top)]),[rank]>=1 && [rank]<=10)
+
+// ---- Page 2 bubble map data (state_geo = static approximate state-capital coordinates) ----
+EVALUATE ADDCOLUMNS(VALUES(customers[State Name]),"lat",[Map Lat],"lng",[Map Lng],"late_pct_500plus",[Late % (States 500+)])

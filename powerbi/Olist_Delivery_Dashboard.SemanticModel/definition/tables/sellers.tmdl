@@ -1,0 +1,34 @@
+table sellers
+	lineageTag: 6348a187-1cd2-426f-a7ab-670ca09177c0
+
+	column seller_id
+		dataType: string
+		lineageTag: 70746271-563e-42de-b124-6e6adb0fdc06
+		sourceColumn: seller_id
+
+	column seller_city
+		dataType: string
+		lineageTag: 90370fcc-f5dc-4af6-adfe-c82406efa817
+		sourceColumn: seller_city
+
+	column seller_state
+		dataType: string
+		lineageTag: 29989477-67b4-41c7-9ffd-f5c064ff3719
+		sourceColumn: seller_state
+
+	column 'Seller Short' = LEFT(sellers[seller_id], 8)
+		dataType: string
+		lineageTag: 4fe7f3fa-d38f-4d5f-a15f-a12a6befe77a
+
+	partition sellers = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(File.Contents("C:\Users\isc\OneDrive\Attachments\olist_sellers_dataset.xlsx"), null, true),
+				    Sheet = Source{[Item="olist_sellers_dataset",Kind="Sheet"]}[Data],
+				    Promoted = Table.PromoteHeaders(Sheet, [PromoteAllScalars=true]),
+				    Typed = Table.TransformColumnTypes(Promoted,{{"seller_id", type text}, {"seller_city", type text}, {"seller_state", type text}}),
+				    Keep = Table.SelectColumns(Typed, {"seller_id", "seller_city", "seller_state"})
+				in
+				    Keep
+

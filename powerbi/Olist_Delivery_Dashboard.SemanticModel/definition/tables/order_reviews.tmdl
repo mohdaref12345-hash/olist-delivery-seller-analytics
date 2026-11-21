@@ -1,0 +1,29 @@
+table order_reviews
+	lineageTag: 840e81a5-d1e2-4c0b-9699-ea71ff0d7d80
+
+	column order_id
+		dataType: string
+		lineageTag: c710058c-b3c6-4eac-a453-17cc329264d4
+		sourceColumn: order_id
+
+	column review_score
+		dataType: double
+		lineageTag: 9666809b-f966-443a-a76b-a3969d23ab58
+		summarizeBy: average
+		sourceColumn: review_score
+
+	partition order_reviews = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(File.Contents("C:\Users\isc\OneDrive\Attachments\olist_order_reviews_dataset.xlsx"), null, true),
+				    Sheet = Source{[Item="olist_order_reviews_dataset",Kind="Sheet"]}[Data],
+				    Promoted = Table.PromoteHeaders(Sheet, [PromoteAllScalars=true]),
+				    Typed = Table.TransformColumnTypes(Promoted,{{"order_id", type text}, {"review_score", Int64.Type}}),
+				    Slim = Table.SelectColumns(Typed, {"order_id", "review_score"}),
+				    Joined = Table.NestedJoin(Slim, {"order_id"}, q_orders_delivered, {"order_id"}, "d", JoinKind.Inner),
+				    NoJoin = Table.RemoveColumns(Joined, {"d"}),
+				    Grouped = Table.Group(NoJoin, {"order_id"}, {{"review_score", each List.Average([review_score]), type nullable number}})
+				in
+				    Grouped
+

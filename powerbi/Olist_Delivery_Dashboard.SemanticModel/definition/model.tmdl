@@ -1,0 +1,34 @@
+model Model
+	culture: en-US
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: en-US
+	valueFilterBehavior: independent
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 0
+
+annotation PBI_ProTooling = ["DevMode","MCP-PBIModeling"]
+
+annotation PBI_QueryOrder = ["raw_customers","raw_order_items","raw_order_reviews","raw_orders","raw_products","raw_sellers","raw_translation","orders","order_items","order_reviews","customers","sellers","products","q_orders_delivered","olist_geolocation_dataset","olist_order_payments_dataset"]
+
+ref table raw_customers
+ref table raw_order_items
+ref table raw_order_reviews
+ref table raw_orders
+ref table raw_products
+ref table raw_sellers
+ref table raw_translation
+ref table orders
+ref table order_items
+ref table order_reviews
+ref table customers
+ref table sellers
+ref table products
+ref table Date
+ref table _Measures
+ref table state_geo
+
+ref cultureInfo en-US
+

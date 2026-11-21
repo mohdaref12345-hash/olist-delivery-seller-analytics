@@ -1,0 +1,61 @@
+table order_items
+	lineageTag: 9ea6754b-7e36-44f4-86eb-81237c8659b5
+
+	column order_id
+		dataType: string
+		lineageTag: 90fc34fd-77da-418a-98ce-950f83407e43
+		sourceColumn: order_id
+
+	column order_item_id
+		dataType: int64
+		lineageTag: 1b88be2f-9860-4354-8da5-a423c396b3e1
+		summarizeBy: none
+		sourceColumn: order_item_id
+
+	column product_id
+		dataType: string
+		lineageTag: 6014d4fc-4063-48cb-b830-d9eff09fb3b5
+		sourceColumn: product_id
+
+	column seller_id
+		dataType: string
+		lineageTag: bda7ef94-6e24-4bd2-b4d1-5252f37d4633
+		sourceColumn: seller_id
+
+	column shipping_limit_date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 1b04f14a-2c27-427f-a93c-deaa4cb461e0
+		sourceColumn: shipping_limit_date
+
+	column price
+		dataType: double
+		lineageTag: 043d40ec-e5be-4e13-a98b-1615007d43bc
+		summarizeBy: sum
+		sourceColumn: price
+
+	column freight_value
+		dataType: double
+		lineageTag: 859140a8-d7ae-448a-8dba-1048fea8331d
+		summarizeBy: sum
+		sourceColumn: freight_value
+
+	column 'Seller Late Handoff Flag' = VAR c = RELATED(orders[order_delivered_carrier_date]) RETURN IF(ISBLANK(c), BLANK(), IF(c > order_items[shipping_limit_date], 1, 0))
+		dataType: int64
+		formatString: 0
+		lineageTag: 9d7200ce-fd90-44c8-b997-2bb3c607e2a8
+		summarizeBy: none
+
+	partition order_items = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(File.Contents("C:\Users\isc\OneDrive\Attachments\olist_order_items_dataset.xlsx"), null, true),
+				    Sheet = Source{[Item="olist_order_items_dataset",Kind="Sheet"]}[Data],
+				    Promoted = Table.PromoteHeaders(Sheet, [PromoteAllScalars=true]),
+				    Typed = Table.TransformColumnTypes(Promoted,{{"order_id", type text}, {"order_item_id", Int64.Type}, {"product_id", type text}, {"seller_id", type text}, {"shipping_limit_date", type datetime}, {"price", type number}, {"freight_value", type number}}),
+				    Joined = Table.NestedJoin(Typed, {"order_id"}, q_orders_delivered, {"order_id"}, "d", JoinKind.Inner),
+				    Result = Table.RemoveColumns(Joined, {"d"})
+				in
+				    Result
+

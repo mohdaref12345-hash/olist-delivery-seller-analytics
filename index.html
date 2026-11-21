@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Delivery &amp; Seller Performance Analytics (Olist) | Power BI Portfolio</title>
+<meta name="description" content="Four-page Power BI dashboard on 96,470 delivered Olist e-commerce orders: on-time delivery, regional performance, seller and carrier analysis, demand and forecast.">
+<style>
+  :root{
+    --navy:#1E293B; --slate:#334155; --bg:#F8FAFC; --ink:#0F172A; --muted:#64748B;
+    --teal:#0F766E; --orange:#EA580C; --line:#E2E8F0; --card:#FFFFFF;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;font-family:"Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;color:var(--ink);background:var(--bg);line-height:1.6}
+  a{color:var(--teal)}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+
+  /* top bar */
+  .topbar{position:sticky;top:0;z-index:10;background:var(--navy);color:#fff}
+  .topbar .wrap{display:flex;align-items:center;justify-content:space-between;height:56px;gap:16px}
+  .brand{font-weight:700;letter-spacing:.2px}
+  .topbar nav{display:flex;gap:4px;flex-wrap:wrap}
+  .topbar nav a{color:#CBD5E1;text-decoration:none;font-size:14px;padding:6px 10px;border-radius:6px}
+  .topbar nav a:hover{background:var(--slate);color:#fff}
+
+  /* hero */
+  .hero{background:var(--navy);color:#fff;padding:56px 0 72px}
+  .eyebrow{color:#FB923C;font-weight:700;font-size:13px;letter-spacing:1.4px;text-transform:uppercase}
+  .hero h1{font-size:clamp(30px,5vw,46px);line-height:1.15;margin:10px 0 16px;max-width:860px}
+  .hero p.lead{font-size:18px;color:#CBD5E1;max-width:760px;margin:0 0 28px}
+  .btns{display:flex;gap:12px;flex-wrap:wrap}
+  .btn{display:inline-block;padding:11px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:15px}
+  .btn.primary{background:var(--orange);color:#fff}
+  .btn.ghost{border:1px solid #475569;color:#E2E8F0}
+  .btn:hover{filter:brightness(1.08)}
+
+  /* KPI strip */
+  .kpis{margin-top:-40px;display:grid;grid-template-columns:repeat(5,1fr);gap:14px}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;box-shadow:0 6px 18px rgba(15,23,42,.06)}
+  .kpi .v{font-size:28px;font-weight:700}
+  .kpi .l{font-size:13px;color:var(--muted)}
+  .kpi.good .v{color:var(--teal)} .kpi.bad .v{color:var(--orange)}
+
+  section{padding:64px 0 8px}
+  h2{font-size:28px;margin:0 0 8px}
+  h2 + p.sub{color:var(--muted);margin:0 0 28px;max-width:760px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px 22px}
+  .card h3{margin:0 0 8px;font-size:17px}
+  .card ul{margin:0;padding-left:18px} .card li{margin:4px 0}
+  .tag{display:inline-block;font-size:12px;font-weight:600;padding:2px 9px;border-radius:99px;background:#CCFBF1;color:#115E59;margin:0 6px 6px 0}
+
+  /* dashboards */
+  .dash{padding-top:56px}
+  .dash .num{color:var(--orange);font-weight:700;font-size:13px;letter-spacing:1.2px}
+  .dash h3.title{font-size:26px;margin:2px 0 6px}
+  .dash p.q{color:var(--muted);margin:0 0 18px;max-width:760px}
+  figure{margin:0 0 22px}
+  .shot{display:block;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff;box-shadow:0 10px 30px rgba(15,23,42,.10)}
+  .shot img{display:block;width:100%;height:auto}
+  figcaption{font-size:13px;color:var(--muted);margin-top:8px}
+  .insight{border-left:4px solid var(--orange)}
+  .insight.t{border-left-color:var(--teal)}
+
+  table{border-collapse:collapse;width:100%;font-size:14px;background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  th,td{padding:9px 12px;border-bottom:1px solid var(--line);text-align:left}
+  th{background:#F1F5F9;font-size:13px;color:var(--slate)}
+  td.n{text-align:right;font-variant-numeric:tabular-nums}
+  .ok{color:var(--teal);font-weight:700}
+  pre{background:var(--navy);color:#E2E8F0;padding:16px 18px;border-radius:12px;overflow:auto;font-size:13px;line-height:1.5}
+  code{font-family:Consolas,"SFMono-Regular",Menlo,monospace}
+  .note{font-size:14px;color:var(--muted)}
+  footer{margin-top:72px;background:var(--navy);color:#CBD5E1;padding:32px 0;font-size:14px}
+  footer a{color:#5EEAD4}
+
+  @media (max-width:900px){
+    .kpis{grid-template-columns:repeat(2,1fr)}
+    .grid2{grid-template-columns:1fr}
+    .topbar nav{display:none}
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap">
+    <span class="brand">Olist Delivery Analytics</span>
+    <nav>
+      <a href="#overview">Overview</a>
+      <a href="#d1">Executive</a>
+      <a href="#d2">Region</a>
+      <a href="#d3">Seller &amp; Carrier</a>
+      <a href="#d4">Demand</a>
+      <a href="#method">Method</a>
+    </nav>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="wrap">
+    <div class="eyebrow">Power BI Portfolio Project</div>
+    <h1>Delivery &amp; Seller Performance Analytics</h1>
+    <p class="lead">A four-page Power BI dashboard built on the public Olist Brazilian e-commerce dataset. It shows how reliably 96,470 delivered orders reached customers, where and why they were late, which sellers drive the problem, and what demand looks like.</p>
+    <div class="btns">
+      <a class="btn primary" href="#d1">See the dashboards</a>
+      <a class="btn ghost" href="Olist_Dashboard.pdf">Download PDF</a>
+      <a class="btn ghost" href="https://github.com/mohdaref12345-hash/olist-delivery-seller-analytics">View on GitHub</a>
+    </div>
+  </div>
+</div>
+
+<main class="wrap">
+
+  <div class="kpis" id="kpis">
+    <div class="kpi good"><div class="v">91.9%</div><div class="l">On-time delivery (OTD)</div></div>
+    <div class="kpi"><div class="v">12.1 days</div><div class="l">Average delivery, purchase to door</div></div>
+    <div class="kpi bad"><div class="v">8.9 days</div><div class="l">Average delay on late orders</div></div>
+    <div class="kpi"><div class="v">4.16 / 5</div><div class="l">Average review (late 2.57 vs on-time 4.29)</div></div>
+    <div class="kpi"><div class="v">13.2M</div><div class="l">Revenue on 96,470 delivered orders</div></div>
+  </div>
+
+  <section id="overview">
+    <h2>Project overview</h2>
+    <p class="sub">The business question: where is delivery performance breaking down, and is the cause the seller or the carrier?</p>
+    <div class="grid2">
+      <div class="card">
+        <h3>What I built</h3>
+        <ul>
+          <li>A 4-page interactive report with a shared sidebar and three slicers (Year, State, Category) that filter every page.</li>
+          <li>45 live DAX measures. Nothing on the dashboards is a hard-coded number.</li>
+          <li>A relational model over the nine Olist source tables, with the raw tables left untouched.</li>
+          <li>A three-way reconciliation of the headline numbers (see Method).</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Headline finding</h3>
+        <p style="margin:0">Carrier transit, not seller handling, drives late orders: <strong>25.2 days</strong> in transit for late orders against <strong>7.4</strong> for on-time ones. Sellers take 5.4 days on late orders versus 2.5 on time. Late orders also score far lower in reviews (<strong>2.57</strong> versus <strong>4.29</strong>).</p>
+      </div>
+    </div>
+    <div style="margin-top:20px">
+      <span class="tag">Power BI Desktop</span><span class="tag">DAX</span><span class="tag">Power Query</span><span class="tag">TMDL / PBIP</span><span class="tag">Data modeling</span><span class="tag">Python (verification)</span>
+    </div>
+    <p class="note">KPI definition: OTD is the share of delivered orders that arrived on or before the estimated delivery date. It is OTD, not OTIF, because the dataset has no in-full information.</p>
+  </section>
+
+  <!-- DASHBOARD 1 -->
+  <section class="dash" id="d1">
+    <div class="num">DASHBOARD 1 OF 4</div>
+    <h3 class="title">Executive Overview</h3>
+    <p class="q">Question it answers: how are we doing overall, when did it go wrong, and at which stage of the journey is the delay?</p>
+    <figure>
+      <a class="shot" href="images/01_Executive_Overview.png" target="_blank" rel="noopener"><img loading="lazy" src="images/01_Executive_Overview.png" alt="Executive Overview dashboard: five KPI cards, on-time delivery by month, late percentage by state, days per stage and key findings"></a>
+      <figcaption>Click the image to open the full 4K version.</figcaption>
+    </figure>
+    <div class="grid2">
+      <div class="card">
+        <h3>What is on the page</h3>
+        <ul>
+          <li>Five KPI cards: OTD, average delivery, average delay, average review, revenue.</li>
+          <li>On-time delivery by month, January 2017 to August 2018. The three lowest months are highlighted in orange.</li>
+          <li>Late delivery % by customer state, only for states with 500 or more orders. The six worst are orange, the best three teal.</li>
+          <li>Days per stage: seller handling versus carrier transit, split into late and on-time orders.</li>
+          <li>A key-findings text box generated by a DAX measure, so it updates with the slicers.</li>
+        </ul>
+      </div>
+      <div class="card insight">
+        <h3>What it shows</h3>
+        <ul>
+          <li>Overall OTD is 91.9%, but monthly OTD dipped close to 80% in the weakest month.</li>
+          <li>Maranh&atilde;o has the highest late rate at 19.7%, followed by Cear&aacute; (15.3%) and Bahia (14.0%). S&atilde;o Paulo is at 5.9%.</li>
+          <li>The gap sits in transit: 25.2 days for late orders against 7.4 for on-time. Seller handling differs by only about three days.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- DASHBOARD 2 -->
+  <section class="dash" id="d2">
+    <div class="num">DASHBOARD 2 OF 4</div>
+    <h3 class="title">Delivery by Region</h3>
+    <p class="q">Question it answers: which states are slow or late, and where is freight eating the margin?</p>
+    <figure>
+      <a class="shot" href="images/02_Delivery_by_Region.png" target="_blank" rel="noopener"><img loading="lazy" src="images/02_Delivery_by_Region.png" alt="Delivery by Region dashboard: late percentage by state, average delivery days by state, bubble map and categories by freight percentage of revenue"></a>
+      <figcaption>Click the image to open the full 4K version.</figcaption>
+    </figure>
+    <div class="grid2">
+      <div class="card">
+        <h3>What is on the page</h3>
+        <ul>
+          <li>KPI row: delivered orders, OTD, average delivery, revenue, freight as a share of revenue (16.6%).</li>
+          <li>Late delivery % by state (17 states with 500+ orders) and average delivery days by state.</li>
+          <li>A bubble map of late % by state. Bubble size is the late rate.</li>
+          <li>Categories ranked by freight as a share of revenue.</li>
+        </ul>
+      </div>
+      <div class="card insight">
+        <h3>What it shows</h3>
+        <ul>
+          <li>The slowest deliveries are in the north: Roraima 29.0 days, Amap&aacute; 26.7, Amazonas 26.0. The south-east is far faster.</li>
+          <li>Freight is 16.6% of revenue overall, but some categories are far heavier, such as christmas_supplies (36.5%) and signaling_and_security (30.4%).</li>
+          <li>Late rate and delivery time do not rank states identically, so both views are kept.</li>
+        </ul>
+      </div>
+    </div>
+    <p class="note">The map is a scatter-plot bubble map using approximate state-capital coordinates (checked against IBGE data, all 27 within about 0.1 degree). Built-in map visuals depend on Bing Maps, which is being retired.</p>
+  </section>
+
+  <!-- DASHBOARD 3 -->
+  <section class="dash" id="d3">
+    <div class="num">DASHBOARD 3 OF 4</div>
+    <h3 class="title">Seller &amp; Carrier Performance</h3>
+    <p class="q">Question it answers: who hands orders to the carrier late, and does the problem sit with sellers or with the carrier?</p>
+    <figure>
+      <a class="shot" href="images/03_Seller_and_Carrier.png" target="_blank" rel="noopener"><img loading="lazy" src="images/03_Seller_and_Carrier.png" alt="Seller and Carrier dashboard: top 10 and bottom 10 sellers by on-time handoff, days per stage and review score by delivery status"></a>
+      <figcaption>Click the image to open the full 4K version.</figcaption>
+    </figure>
+    <div class="grid2">
+      <div class="card">
+        <h3>What is on the page</h3>
+        <ul>
+          <li>KPI row: delivered orders, late hand-off % (9.32%), average seller handling (2.7 days), carrier transit (8.9 days), average review.</li>
+          <li>Top 10 and bottom 10 sellers by on-time hand-off. Only sellers with 30+ orders are ranked, so small samples cannot top the table.</li>
+          <li>Days per stage and average review score, each split by late versus on-time.</li>
+        </ul>
+      </div>
+      <div class="card insight t">
+        <h3>What it shows</h3>
+        <ul>
+          <li>The ten best sellers all hand over on time (100%), including sellers with 150+ orders.</li>
+          <li>The ten worst range from 17.6% to 52.2% on-time hand-off. One of them handles 246 orders at 49.7%, a high-volume problem worth acting on.</li>
+          <li>Late orders score 2.57 in reviews versus 4.29 on time, so lateness has a clear customer cost.</li>
+        </ul>
+      </div>
+    </div>
+    <p class="note">Sellers are shown by the first 8 characters of their ID (unique across all 3,095 sellers) to keep the tables readable. Ranking ties are broken by order volume.</p>
+  </section>
+
+  <!-- DASHBOARD 4 -->
+  <section class="dash" id="d4">
+    <div class="num">DASHBOARD 4 OF 4</div>
+    <h3 class="title">Demand &amp; Forecast</h3>
+    <p class="q">Question it answers: how is demand trending, which categories earn the revenue, and how much buffer does variable delivery time require?</p>
+    <figure>
+      <a class="shot" href="images/04_Demand_and_Forecast.png" target="_blank" rel="noopener"><img loading="lazy" src="images/04_Demand_and_Forecast.png" alt="Demand and Forecast dashboard: monthly delivered orders with a 3-month forecast, top categories by revenue, orders by weekday and month, and a safety stock note"></a>
+      <figcaption>Click the image to open the full 4K version.</figcaption>
+    </figure>
+    <div class="grid2">
+      <div class="card">
+        <h3>What is on the page</h3>
+        <ul>
+          <li>Monthly delivered orders with a 3-month forecast and a 95% confidence band.</li>
+          <li>Top 10 categories by revenue.</li>
+          <li>Orders by weekday and orders by month of year.</li>
+          <li>A safety-stock note calculated by DAX from the delivery-time spread.</li>
+        </ul>
+      </div>
+      <div class="card insight t">
+        <h3>What it shows</h3>
+        <ul>
+          <li>Monthly orders grew steadily through 2017 and flattened in 2018. The forecast band is wide, so it is a rough guide.</li>
+          <li>health_beauty and watches_gifts lead revenue at about 1.2M each, followed by bed_bath_table and sports_leisure at about 1.0M.</li>
+          <li>Mondays are the busiest day (15.7K orders) and Saturdays the quietest (10.6K).</li>
+          <li>Delivery time averages 12.1 days with a standard deviation of 9.6. For a 95% service level, plan about 15.8 extra days (1.65 x standard deviation).</li>
+        </ul>
+      </div>
+    </div>
+    <p class="note">Read the month-of-year chart with care: January to August include two years of orders, September to December only one, so the totals are not like-for-like and the autumn drop is partly a data-coverage effect.</p>
+  </section>
+
+  <!-- METHOD -->
+  <section id="method">
+    <h2>Method and verification</h2>
+    <p class="sub">Every headline number was checked three independent ways before the dashboard was called done.</p>
+    <div class="grid2" style="margin-bottom:20px">
+      <div class="card">
+        <h3>How the numbers were checked</h3>
+        <ul>
+          <li><strong>A</strong>: the report model, as shown on the dashboard.</li>
+          <li><strong>B</strong>: independent DAX written directly against the untouched raw tables.</li>
+          <li><strong>C</strong>: Python on the original CSV files.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Data handling</h3>
+        <ul>
+          <li>Nine Olist source tables (Excel) are loaded as raw tables and never edited.</li>
+          <li>Only delivered orders are analysed. Reviews: 99,224 raw rows became 95,824 clean rows (2,849 orders not delivered, and 551 repeat reviews averaged per order).</li>
+          <li>States, months and categories need 500+ orders to be ranked (17 of 27 states, 20 of 23 months, 26 of 74 categories qualify).</li>
+        </ul>
+      </div>
+    </div>
+
+    <table>
+      <thead><tr><th>Metric</th><th>A. Report model</th><th>B. Raw-table DAX</th><th>C. Python on CSV</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td>Delivered orders</td><td class="n">96,470</td><td class="n">96,470</td><td class="n">96,470</td><td class="ok">MATCH</td></tr>
+        <tr><td>On-time delivery (OTD)</td><td class="n">91.888%</td><td class="n">91.888%</td><td class="n">91.888%</td><td class="ok">MATCH</td></tr>
+        <tr><td>Average delivery days</td><td class="n">12.0936</td><td class="n">12.0936</td><td class="n">12.0936</td><td class="ok">MATCH</td></tr>
+        <tr><td>Average delay, late orders (days)</td><td class="n">8.8669</td><td class="n">8.8669</td><td class="n">8.8669</td><td class="ok">MATCH</td></tr>
+        <tr><td>Revenue</td><td class="n">13,220,248.93</td><td class="n">13,220,248.93</td><td class="n">13,220,248.93</td><td class="ok">MATCH</td></tr>
+        <tr><td>Freight cost</td><td class="n">2,198,145.90</td><td class="n">2,198,145.90</td><td class="n">2,198,145.90</td><td class="ok">MATCH</td></tr>
+        <tr><td>Freight % of revenue</td><td class="n">16.627%</td><td class="n">16.627%</td><td class="n">16.627%</td><td class="ok">MATCH</td></tr>
+        <tr><td>Average review score</td><td class="n">4.1562</td><td class="n">n/a</td><td class="n">4.1562</td><td class="ok">MATCH</td></tr>
+        <tr><td>Seller late hand-off %</td><td class="n">9.32%</td><td class="n">n/a</td><td class="n">9.32%</td><td class="ok">MATCH</td></tr>
+      </tbody>
+    </table>
+    <p class="note">Full table: <a href="docs/reconciliation.csv">docs/reconciliation.csv</a>. Queries: <a href="docs/verification_queries.dax">docs/verification_queries.dax</a>.</p>
+
+    <h3 style="margin-top:36px">A sample of the DAX</h3>
+    <pre><code>Late Delivery % =
+AVERAGE(orders[Is Late])
+
+Seller Rank (Top) =
+IF([Seller Orders] >= 30,
+   RANKX(FILTER(ALLSELECTED(sellers[Seller Short]), [Seller Orders] >= 30),
+         [Seller Rank Key], , DESC, DENSE))
+
+Late Rank (500+ States) =
+IF([Delivered Orders] >= 500,
+   RANKX(FILTER(ALLSELECTED(customers[customer_state]), [Delivered Orders] >= 500),
+         [Late Delivery %], , DESC, DENSE))</code></pre>
+    <p class="note">All 45 measures: <a href="docs/measures.dax">docs/measures.dax</a>. Model notes: <a href="docs/MODEL_NOTES.md">docs/MODEL_NOTES.md</a>.</p>
+  </section>
+
+  <section id="repo">
+    <h2>Explore the project</h2>
+    <div class="grid2">
+      <div class="card">
+        <h3>In this repository</h3>
+        <ul>
+          <li><code>powerbi/</code>: the Power BI project (PBIP format, readable text files).</li>
+          <li><code>data/</code>: the nine Olist source Excel files.</li>
+          <li><code>docs/</code>: DAX measures, verification, model notes, theme.</li>
+          <li><code>images/</code>: the four dashboard pages in 4K.</li>
+          <li><code>Olist_Dashboard.pdf</code>: the report as a PDF.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>To open the report</h3>
+        <ul>
+          <li>Open <code>powerbi/Olist_Delivery_Dashboard.pbip</code> in Power BI Desktop (enable the Power BI Project preview feature first).</li>
+          <li>Point the data sources to your local copy of <code>data/</code> under Transform data, then Data source settings.</li>
+          <li>Refresh.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    Data: public Olist Brazilian E-Commerce dataset (Kaggle). Built by Mohammed Aref Sultan.
+    <a href="https://github.com/mohdaref12345-hash/olist-delivery-seller-analytics">GitHub repository</a>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,33 @@
+table products
+	lineageTag: a764f5a1-38fc-4e59-977b-cef0204ca8e2
+
+	column product_id
+		dataType: string
+		lineageTag: e8b61ddd-d7c3-4fcf-a14f-b27cbf4a976a
+		sourceColumn: product_id
+
+	column category
+		dataType: string
+		lineageTag: 97fd1286-e62f-4a39-88b4-34b447e5ca11
+		sourceColumn: category
+
+	partition products = m
+		mode: import
+		source =
+				let
+				    PSource = Excel.Workbook(File.Contents("C:\Users\isc\OneDrive\Attachments\olist_products_dataset.xlsx"), null, true),
+				    PSheet = PSource{[Item="olist_products_dataset",Kind="Sheet"]}[Data],
+				    PPromoted = Table.PromoteHeaders(PSheet, [PromoteAllScalars=true]),
+				    PTyped = Table.TransformColumnTypes(PPromoted,{{"product_id", type text}, {"product_category_name", type text}}),
+				    PKeep = Table.SelectColumns(PTyped, {"product_id", "product_category_name"}),
+				    TSource = Excel.Workbook(File.Contents("C:\Users\isc\OneDrive\Attachments\product_category_name_translation.xlsx"), null, true),
+				    TSheet = TSource{[Item="product_category_name_translati",Kind="Sheet"]}[Data],
+				    TPromoted = Table.PromoteHeaders(TSheet, [PromoteAllScalars=true]),
+				    TClean = Table.TransformColumns(TPromoted, {{"product_category_name", each Text.Trim(Text.Replace(Text.From(_), "\uFEFF", "")), type text}}),
+				    Merged = Table.NestedJoin(PKeep, {"product_category_name"}, TClean, {"product_category_name"}, "t", JoinKind.LeftOuter),
+				    Expanded = Table.ExpandTableColumn(Merged, "t", {"product_category_name_english"}, {"category_en"}),
+				    WithCat = Table.AddColumn(Expanded, "category", each if [category_en] <> null then [category_en] else if [product_category_name] <> null then [product_category_name] else "Unknown", type text),
+				    Result = Table.SelectColumns(WithCat, {"product_id", "category"})
+				in
+				    Result
+
