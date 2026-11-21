@@ -34,7 +34,7 @@ Carrier transit, not seller handling, drives late orders: **25.2 days** in trans
 
 ## Dashboards
 
-All four pages share the same left sidebar for navigation and three slicers (**Year, State, Category**) that filter every page. Click an image to open it full size.
+All four pages share the same left sidebar for navigation and three slicers (**Year, State, Category**) that filter every page.
 
 ### 1. Executive Overview
 
